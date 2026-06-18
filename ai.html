@@ -175,13 +175,20 @@ Be concise, professional, and helpful. Format reports clearly.`;
           })
         });
         const data = await response.json();
+        console.log('Groq response:', data);
+        if (data.error) {
+          document.getElementById('typing')?.remove();
+          appendMessage('assistant', 'Error: ' + data.error.message);
+          return;
+        }
         const reply = data.choices[0].message.content;
         document.getElementById('typing')?.remove();
         appendMessage('assistant', reply);
         messages.push({ role: 'assistant', content: reply });
       } catch (err) {
         document.getElementById('typing')?.remove();
-        appendMessage('assistant', 'Sorry, I could not connect. Please check your Groq API key.');
+        appendMessage('assistant', 'Error details: ' + err.message);
+        console.error('Full error:', err);
       }
     }
 
