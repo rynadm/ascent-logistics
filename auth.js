@@ -42,7 +42,7 @@ function checkAuth() {
   // Page not allowed for this role
   const allowed = permissions[page] || [];
   if (!allowed.includes(user.role)) {
-    window.location.href = user.role === 'driver' ? 'tracking.html' : 'index.html';
+    window.location.href = '404.html';
     return null;
   }
 
