@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dock & Yard Management - Ascent Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <script src="auth.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+  <nav class="bg-slate-900 h-14 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3 text-slate-200 font-medium text-base">
+      <i class="ti ti-truck-delivery text-blue-400 text-xl"></i>
+      Ascent Logistics and Transport
+    </div>
+    <div id="navUser" class="flex items-center gap-3"></div>
+  </nav>
+
+  <div class="flex">
+    <aside class="bg-slate-800 w-48 min-h-screen pt-4">
+      <div id="sidebar"></div>
+    </aside>
+
+    <main class="flex-1 p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h1 class="text-lg font-medium text-slate-700">Dock & Yard Management</h1>
+        <button onclick="openScheduleModal()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg">
+          <i class="ti ti-plus"></i> Schedule Dock
+        </button>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-1">Total docks</p>
+          <p class="text-2xl font-medium text-slate-800">6</p>
+          <p class="text-xs text-slate-400 mt-1">Available slots</p>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-1">Occupied</p>
+          <p class="text-2xl font-medium text-blue-500" id="occupiedCount">0</p>
+          <p class="text-xs text-blue-400 mt-1">Currently in use</p>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-1">Available</p>
+          <p class="text-2xl font-medium text-green-500" id="availableCount">0</p>
+          <p class="text-xs text-green-400 mt-1">Ready for trucks</p>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-1">Trucks arriving</p>
+          <p class="text-2xl font-medium text-yellow-500" id="arrivingCount">0</p>
+          <p class="text-xs text-yellow-400 mt-1">Within 30 minutes</p>
+        </div>
+      </div>
+
+      <!-- SMART ALERTS -->
+      <div id="alertsBox" class="flex flex-col gap-2 mb-6"></div>
+
+      <div class="grid grid-cols-2 gap-6">
+
+        <!-- DOCK VISUAL -->
+        <div>
+          <p class="text-sm font-medium text-slate-600 mb-3">Dock bay status</p>
+          <div class="bg-white rounded-xl border border-slate-200 p-5">
+
+            <!-- Warehouse building visual -->
+            <div class="bg-slate-800 rounded-lg p-3 mb-4 text-center">
+              <p class="text-slate-300 text-xs font-medium tracking-widest uppercase">Ascent Main Warehouse</p>
+            </div>
+
+            <!-- Dock slots grid -->
+            <div id="dockGrid" class="grid grid-cols-3 gap-3"></div>
+
+            <!-- Legend -->
+            <div class="flex items-center gap-4 mt-4 pt-4 border-t border-slate-100">
+              <div class="flex items-center gap-1.5">
+                <div class="w-3 h-3 rounded bg-green-400"></div>
+                <p class="text-xs text-slate-500">Available</p>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <div class="w-3 h-3 rounded bg-blue-400"></div>
+                <p class="text-xs text-slate-500">Loading</p>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <div class="w-3 h-3 rounded bg-yellow-400"></div>
+                <p class="text-xs text-slate-500">Arriving</p>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <div class="w-3 h-3 rounded bg-red-400"></div>
+                <p class="text-xs text-slate-500">Maintenance</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCHEDULE TABLE -->
+        <div>
+          <p class="text-sm font-medium text-slate-600 mb-3">Today's schedule</p>
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200">
+                  <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Dock</th>
+                  <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Truck</th>
+                  <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Time</th>
+                  <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Type</th>
+                  <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Status</th>
+                  <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Action</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- YARD TRUCKS -->
+      <p class="text-sm font-medium text-slate-600 mt-6 mb-3">Trucks in yard</p>
+      <div id="yardTrucks" class="grid grid-cols-4 gap-4"></div>
+
+    </main>
+  </div>
+
+  <!-- SCHEDULE MODAL -->
+  <div id="scheduleModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-base font-medium text-slate-700">Schedule Dock</h2>
+        <button onclick="closeScheduleModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="ti ti-x text-lg"></i>
+        </button>
+      </div>
+      <div class="flex flex-col gap-3">
+        <select id="dockSelect" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400">
+          <option value="">Select dock</option>
+          <option>Dock A1</option>
+          <option>Dock A2</option>
+          <option>Dock B1</option>
+          <option>Dock B2</option>
+          <option>Dock C1</option>
+          <option>Dock C2</option>
+        </select>
+        <input id="truckPlate" type="text" placeholder="Truck plate number" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="driverName" type="text" placeholder="Driver name" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="scheduleTime" type="time" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <select id="dockType" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400">
+          <option value="inbound">Inbound (Receiving)</option>
+          <option value="outbound">Outbound (Shipping)</option>
+        </select>
+        <button onclick="scheduleDock()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 rounded-lg mt-1">
+          Confirm Schedule
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCK DETAIL MODAL -->
+  <div id="dockModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-medium text-slate-700" id="dockModalTitle">Dock Details</h2>
+        <button onclick="closeDockModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="ti ti-x text-lg"></i>
+        </button>
+      </div>
+      <div id="dockModalContent"></div>
+      <div id="dockModalActions" class="flex gap-2 mt-4"></div>
+    </div>
+  </div>
+
+  <script>
+    const user = checkAuth();
+    if (user) {
+      buildSidebar(user);
+      buildNav(user);
+    }
+
+    let docks = [
+      { id: 'A1', status: 'loading', truck: 'Truck 01 - 12345-A-1', driver: 'Youssef Alami', time: '08:00', type: 'outbound', eta: null },
+      { id: 'A2', status: 'arriving', truck: 'Truck 02 - 67890-B-2', driver: 'Karim Benali', time: '09:30', type: 'inbound', eta: '25 min' },
+      { id: 'B1', status: 'available', truck: null, driver: null, time: null, type: null, eta: null },
+      { id: 'B2', status: 'loading', truck: 'Truck 03 - 11223-C-3', driver: 'Hassan Tazi', time: '10:00', type: 'outbound', eta: null },
+      { id: 'C1', status: 'available', truck: null, driver: null, time: null, type: null, eta: null },
+      { id: 'C2', status: 'maintenance', truck: null, driver: null, time: null, type: null, eta: null },
+    ];
+
+    let schedule = [
+      { dock: 'A1', truck: '12345-A-1', driver: 'Youssef Alami', time: '08:00', type: 'outbound', status: 'loading' },
+      { dock: 'A2', truck: '67890-B-2', driver: 'Karim Benali', time: '09:30', type: 'inbound', status: 'arriving' },
+      { dock: 'B2', truck: '11223-C-3', driver: 'Hassan Tazi', time: '10:00', type: 'outbound', status: 'loading' },
+      { dock: 'B1', truck: '44556-D-4', driver: 'Omar Idrissi', time: '11:30', type: 'inbound', status: 'scheduled' },
+      { dock: 'C1', truck: '77889-E-5', driver: 'Ali Mansouri', time: '13:00', type: 'outbound', status: 'scheduled' },
+    ];
+
+    const yardTrucks = [
+      { plate: '12345-A-1', driver: 'Youssef Alami', status: 'loading', dock: 'A1', arrived: '07:45' },
+      { plate: '11223-C-3', driver: 'Hassan Tazi', status: 'loading', dock: 'B2', arrived: '09:50' },
+      { plate: '99001-F-6', driver: 'Samir Choukri', status: 'waiting', dock: '-', arrived: '10:15' },
+    ];
+
+    function getStatusColor(status) {
+      const colors = {
+        available: 'bg-green-400',
+        loading: 'bg-blue-400',
+        arriving: 'bg-yellow-400',
+        maintenance: 'bg-red-400',
+        scheduled: 'bg-slate-300',
+      };
+      return colors[status] || 'bg-slate-300';
+    }
+
+    function getStatusBadge(status) {
+      const badges = {
+        available: 'bg-green-100 text-green-700',
+        loading: 'bg-blue-100 text-blue-700',
+        arriving: 'bg-yellow-100 text-yellow-700',
+        maintenance: 'bg-red-100 text-red-700',
+        scheduled: 'bg-slate-100 text-slate-600',
+        waiting: 'bg-orange-100 text-orange-700',
+      };
+      return badges[status] || 'bg-slate-100 text-slate-600';
+    }
+
+    function renderDockGrid() {
+      document.getElementById('dockGrid').innerHTML = docks.map(dock => `
+        <div onclick="openDockModal('${dock.id}')"
+          class="border-2 rounded-xl p-3 cursor-pointer hover:shadow-md transition-all
+          ${dock.status === 'available' ? 'border-green-200 bg-green-50' :
+            dock.status === 'loading' ? 'border-blue-200 bg-blue-50' :
+            dock.status === 'arriving' ? 'border-yellow-200 bg-yellow-50' :
+            'border-red-200 bg-red-50'}">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-sm font-medium text-slate-700">Dock ${dock.id}</p>
+            <div class="w-3 h-3 rounded-full ${getStatusColor(dock.status)}"></div>
+          </div>
+          ${dock.truck ? `
+            <p class="text-xs text-slate-500 truncate">${dock.truck}</p>
+            <p class="text-xs text-slate-400">${dock.time}</p>
+            ${dock.eta ? `<p class="text-xs text-yellow-600 font-medium mt-1">ETA: ${dock.eta}</p>` : ''}
+          ` : `
+            <p class="text-xs text-slate-400 capitalize">${dock.status}</p>
+          `}
+        </div>
+      `).join('');
+
+      // Update stats
+      document.getElementById('occupiedCount').textContent = docks.filter(d => d.status === 'loading').length;
+      document.getElementById('availableCount').textContent = docks.filter(d => d.status === 'available').length;
+      document.getElementById('arrivingCount').textContent = docks.filter(d => d.status === 'arriving').length;
+    }
+
+    function renderSchedule() {
+      document.getElementById('scheduleTable').innerHTML = schedule.map((s, i) => `
+        <tr class="border-b border-slate-100 hover:bg-slate-50">
+          <td class="px-4 py-3 text-slate-700 font-medium">Dock ${s.dock}</td>
+          <td class="px-4 py-3 text-slate-600 text-xs">${s.truck}</td>
+          <td class="px-4 py-3 text-slate-600">${s.time}</td>
+          <td class="px-4 py-3">
+            <span class="text-xs px-2 py-1 rounded-full ${s.type === 'inbound' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'} capitalize">
+              ${s.type}
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            <span class="text-xs px-2 py-1 rounded-full ${getStatusBadge(s.status)} capitalize">${s.status}</span>
+          </td>
+          <td class="px-4 py-3">
+            ${s.status === 'scheduled' ? `
+              <button onclick="markArrived(${i})" class="text-blue-500 hover:text-blue-700 text-xs flex items-center gap-1">
+                <i class="ti ti-check"></i> Arrived
+              </button>
+            ` : s.status === 'loading' ? `
+              <button onclick="markComplete(${i})" class="text-green-500 hover:text-green-700 text-xs flex items-center gap-1">
+                <i class="ti ti-truck-delivery"></i> Done
+              </button>
+            ` : '—'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderYardTrucks() {
+      document.getElementById('yardTrucks').innerHTML = yardTrucks.map(t => `
+        <div class="bg-white border border-slate-200 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
+              <i class="ti ti-truck text-slate-500 text-lg"></i>
+            </div>
+            <span class="text-xs px-2 py-1 rounded-full ${getStatusBadge(t.status)} capitalize">${t.status}</span>
+          </div>
+          <p class="text-sm font-medium text-slate-700 mb-1">${t.plate}</p>
+          <p class="text-xs text-slate-400 mb-1"><i class="ti ti-user mr-1"></i>${t.driver}</p>
+          <p class="text-xs text-slate-400 mb-1"><i class="ti ti-door-enter mr-1"></i>Dock: ${t.dock}</p>
+          <p class="text-xs text-slate-400"><i class="ti ti-clock mr-1"></i>Arrived: ${t.arrived}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderAlerts() {
+      const alerts = [];
+      const arrivingDocks = docks.filter(d => d.status === 'arriving');
+      arrivingDocks.forEach(d => {
+        alerts.push({
+          type: 'warning',
+          icon: 'ti-alert-triangle',
+          message: `Truck ${d.truck} is arriving at Dock ${d.id} in ${d.eta} — prepare staff for ${d.type === 'inbound' ? 'receiving' : 'loading'}.`
+        });
+      });
+
+      const availableDocks = docks.filter(d => d.status === 'available');
+      if (availableDocks.length > 0) {
+        alerts.push({
+          type: 'info',
+          icon: 'ti-info-circle',
+          message: `${availableDocks.length} dock(s) available: ${availableDocks.map(d => 'Dock ' + d.id).join(', ')}.`
+        });
+      }
+
+      const maintenanceDocks = docks.filter(d => d.status === 'maintenance');
+      if (maintenanceDocks.length > 0) {
+        alerts.push({
+          type: 'error',
+          icon: 'ti-tools',
+          message: `Dock ${maintenanceDocks.map(d => d.id).join(', ')} is under maintenance and unavailable.`
+        });
+      }
+
+      document.getElementById('alertsBox').innerHTML = alerts.map(a => `
+        <div class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm
+          ${a.type === 'warning' ? 'bg-yellow-50 border border-yellow-200 text-yellow-700' :
+            a.type === 'error' ? 'bg-red-50 border border-red-200 text-red-700' :
+            'bg-blue-50 border border-blue-200 text-blue-700'}">
+          <i class="ti ${a.icon} text-lg flex-shrink-0"></i>
+          <p>${a.message}</p>
+        </div>
+      `).join('');
+    }
+
+    function openDockModal(dockId) {
+      const dock = docks.find(d => d.id === dockId);
+      if (!dock) return;
+      document.getElementById('dockModalTitle').textContent = `Dock ${dock.id}`;
+      document.getElementById('dockModalContent').innerHTML = `
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center justify-between py-2 border-b border-slate-100">
+            <p class="text-xs text-slate-400">Status</p>
+            <span class="text-xs px-2 py-1 rounded-full ${getStatusBadge(dock.status)} capitalize">${dock.status}</span>
+          </div>
+          ${dock.truck ? `
+            <div class="flex items-center justify-between py-2 border-b border-slate-100">
+              <p class="text-xs text-slate-400">Truck</p>
+              <p class="text-xs text-slate-700">${dock.truck}</p>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-slate-100">
+              <p class="text-xs text-slate-400">Driver</p>
+              <p class="text-xs text-slate-700">${dock.driver}</p>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-slate-100">
+              <p class="text-xs text-slate-400">Scheduled</p>
+              <p class="text-xs text-slate-700">${dock.time}</p>
+            </div>
+            <div class="flex items-center justify-between py-2">
+              <p class="text-xs text-slate-400">Type</p>
+              <p class="text-xs text-slate-700 capitalize">${dock.type}</p>
+            </div>
+          ` : `<p class="text-sm text-slate-400 text-center py-4">No truck assigned</p>`}
+        </div>
+      `;
+      document.getElementById('dockModalActions').innerHTML = dock.status === 'available' ? `
+        <button onclick="closeDockModal(); openScheduleModal();" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 rounded-lg">
+          Schedule Truck
+        </button>
+      ` : dock.status === 'loading' ? `
+        <button onclick="completeDock('${dock.id}')" class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm py-2 rounded-lg">
+          Mark Complete
+        </button>
+      ` : '';
+      document.getElementById('dockModal').style.display = 'flex';
+    }
+
+    function closeDockModal() {
+      document.getElementById('dockModal').style.display = 'none';
+    }
+
+    function completeDock(dockId) {
+      const dock = docks.find(d => d.id === dockId);
+      if (dock) {
+        dock.status = 'available';
+        dock.truck = null;
+        dock.driver = null;
+        dock.time = null;
+        dock.type = null;
+      }
+      closeDockModal();
+      renderAll();
+    }
+
+    function markArrived(i) {
+      schedule[i].status = 'loading';
+      const dock = docks.find(d => d.id === schedule[i].dock);
+      if (dock) dock.status = 'loading';
+      renderAll();
+    }
+
+    function markComplete(i) {
+      schedule[i].status = 'completed';
+      const dock = docks.find(d => d.id === schedule[i].dock);
+      if (dock) {
+        dock.status = 'available';
+        dock.truck = null;
+        dock.driver = null;
+      }
+      renderAll();
+    }
+
+    function openScheduleModal() {
+      document.getElementById('scheduleModal').style.display = 'flex';
+    }
+
+    function closeScheduleModal() {
+      document.getElementById('scheduleModal').style.display = 'none';
+    }
+
+    function scheduleDock() {
+      const dock = document.getElementById('dockSelect').value;
+      const truck = document.getElementById('truckPlate').value;
+      const driver = document.getElementById('driverName').value;
+      const time = document.getElementById('scheduleTime').value;
+      const type = document.getElementById('dockType').value;
+
+      if (!dock || !truck || !driver || !time) return alert('Please fill all fields');
+
+      schedule.push({ dock: dock.replace('Dock ', ''), truck, driver, time, type, status: 'scheduled' });
+      closeScheduleModal();
+      renderAll();
+    }
+
+    function renderAll() {
+      renderDockGrid();
+      renderSchedule();
+      renderYardTrucks();
+      renderAlerts();
+    }
+
+    renderAll();
+
+    // Simulate live ETA countdown
+    setInterval(() => {
+      docks.forEach(dock => {
+        if (dock.status === 'arriving' && dock.eta) {
+          const mins = parseInt(dock.eta);
+          if (mins > 1) {
+            dock.eta = (mins - 1) + ' min';
+          } else {
+            dock.status = 'loading';
+            dock.eta = null;
+          }
+          renderAll();
+        }
+      });
+    }, 10000);
+  </script>
+
+</body>
+</html>
