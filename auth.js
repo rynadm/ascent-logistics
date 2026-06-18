@@ -12,7 +12,8 @@ const permissions = {
   'tracking.html':  ['admin', 'manager', 'operator', 'driver'],
   'ai.html':        ['admin', 'manager', 'operator', 'driver'],
   'settings.html':  ['admin'],
-  'users.html':     ['admin'],
+  'reports.html':   ['admin', 'manager'],
+'users.html':     ['admin'],
 };
 
 // Pages where manager can't modify (view only)
@@ -80,7 +81,8 @@ function buildSidebar(user) {
     { href: 'shipping.html',  icon: 'ti-package-export',   label: 'Shipping',        roles: ['admin','manager','operator'] },
     { href: 'tracking.html',  icon: 'ti-map-pin',          label: 'Order Tracking',  roles: ['admin','manager','operator','driver'] },
     { href: 'ai.html',        icon: 'ti-robot',            label: 'AI Assistant',    roles: ['admin','manager','operator','driver'] },
-    { href: 'users.html',     icon: 'ti-users',            label: 'Manage Users',    roles: ['admin'] },
+    { href: 'reports.html',   icon: 'ti-file-analytics',   label: 'Reports',         roles: ['admin', 'manager'] },
+{ href: 'users.html',     icon: 'ti-users',             label: 'Manage Users',    roles: ['admin'] },
     { href: 'settings.html',  icon: 'ti-settings',         label: 'Settings',        roles: ['admin'] },
   ];
 
@@ -111,3 +113,28 @@ function buildNav(user) {
     </button>
   `;
 }
+// Mobile: collapse sidebar on small screens
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.querySelector('aside');
+  const main = document.querySelector('main');
+  if (!sidebar) return;
+
+  if (window.innerWidth < 768) {
+    sidebar.style.display = 'none';
+
+    // Add hamburger button to nav
+    const nav = document.querySelector('nav');
+    const btn = document.createElement('button');
+    btn.innerHTML = '<i class="ti ti-menu-2 text-slate-300 text-xl"></i>';
+    btn.className = 'mr-3';
+    btn.onclick = () => {
+      sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
+      sidebar.style.position = 'fixed';
+      sidebar.style.top = '56px';
+      sidebar.style.left = '0';
+      sidebar.style.zIndex = '100';
+      sidebar.style.height = '100vh';
+    };
+    nav.querySelector('div').prepend(btn);
+  }
+});
