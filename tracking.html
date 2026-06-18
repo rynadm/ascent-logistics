@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Tracking - Ascent Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <script src="auth.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+  <nav class="bg-slate-900 h-14 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3 text-slate-200 font-medium text-base">
+      <i class="ti ti-truck-delivery text-blue-400 text-xl"></i>
+      Ascent Logistics and Transport
+    </div>
+    <div id="navUser" class="flex items-center gap-3"></div>
+  </nav>
+
+  <div class="flex">
+    <aside class="bg-slate-800 w-48 min-h-screen pt-4">
+      <div id="sidebar"></div>
+    </aside>
+
+    <main class="flex-1 p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h1 class="text-lg font-medium text-slate-700">Order Tracking</h1>
+      </div>
+
+      <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 mb-6 max-w-md">
+        <i class="ti ti-search text-slate-400"></i>
+        <input id="searchInput" type="text" placeholder="Search by order ID or client..." class="outline-none text-sm text-slate-600 w-full" oninput="filterOrders()" />
+      </div>
+
+      <div id="ordersList" class="flex flex-col gap-4"></div>
+    </main>
+  </div>
+
+  <script>
+    const user = checkAuth();
+    if (user) {
+      buildSidebar(user);
+      buildNav(user);
+    }
+
+    const orders = [
+      { id: 'ORD-001', client: 'Client A - Casablanca', product: 'Electronics - Batch 12', qty: 50, date: '2024-06-18', status: 'delivered', steps: ['Order placed', 'Warehouse processing', 'Dispatched', 'Delivered'] },
+      { id: 'ORD-002', client: 'Client B - Rabat', product: 'Textiles - Roll 5', qty: 30, date: '2024-06-18', status: 'dispatched', steps: ['Order placed', 'Warehouse processing', 'Dispatched'] },
+      { id: 'ORD-003', client: 'Client C - Marrakech', product: 'Auto Parts - Set B', qty: 20, date: '2024-06-17', status: 'processing', steps: ['Order placed', 'Warehouse processing'] },
+      { id: 'ORD-004', client: 'Client D - Tanger', product: 'Food Items - Crate 9', qty: 100, date: '2024-06-17', status: 'delivered', steps: ['Order placed', 'Warehouse processing', 'Dispatched', 'Delivered'] },
+      { id: 'ORD-005', client: 'Client E - Agadir', product: 'Cosmetics - Pack 3', qty: 15, date: '2024-06-16', status: 'placed', steps: ['Order placed'] },
+    ];
+
+    const allSteps = ['Order placed', 'Warehouse processing', 'Dispatched', 'Delivered'];
+
+    function getStatusColor(status) {
+      if (status === 'delivered') return 'bg-green-100 text-green-700';
+      if (status === 'dispatched') return 'bg-blue-100 text-blue-700';
+      if (status === 'processing') return 'bg-yellow-100 text-yellow-700';
+      return 'bg-slate-100 text-slate-600';
+    }
+
+    function renderOrders(data) {
+      const container = document.getElementById('ordersList');
+      container.innerHTML = data.map(o => {
+        const completedSteps = o.steps.length;
+        const stepsHTML = allSteps.map((step, i) => {
+          const done = i < completedSteps;
+          const active = i === completedSteps - 1;
+          return `
+            <div class="flex flex-col items-center flex-1">
+              <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium mb-1
+                ${done ? 'bg-blue-500 text-white' : 'bg-slate-200 text-slate-400'}
+                ${active ? 'ring-2 ring-blue-300' : ''}">
+                ${done ? '<i class="ti ti-check text-xs"></i>' : i + 1}
+              </div>
+              <p class="text-xs text-center ${done ? 'text-slate-600' : 'text-slate-400'}">${step}</p>
+            </div>
+            ${i < allSteps.length - 1 ? `<div class="flex-1 h-0.5 mt-3.5 ${i < completedSteps - 1 ? 'bg-blue-400' : 'bg-slate-200'}"></div>` : ''}
+          `;
+        }).join('');
+
+        return `
+          <div class="bg-white rounded-lg border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <p class="text-sm font-medium text-slate-700">${o.id} — ${o.client}</p>
+                <p class="text-xs text-slate-400 mt-0.5">${o.product} · Qty: ${o.qty} · ${o.date}</p>
+              </div>
+              <span class="text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(o.status)} capitalize">${o.status}</span>
+            </div>
+            <div class="flex items-start">${stepsHTML}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterOrders() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = orders.filter(o =>
+        o.id.toLowerCase().includes(search) || o.client.toLowerCase().includes(search)
+      );
+      renderOrders(filtered);
+    }
+
+    renderOrders(orders);
+  </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shipping - Ascent Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <script src="auth.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+  <nav class="bg-slate-900 h-14 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3 text-slate-200 font-medium text-base">
+      <i class="ti ti-truck-delivery text-blue-400 text-xl"></i>
+      Ascent Logistics and Transport
+    </div>
+    <div id="navUser" class="flex items-center gap-3"></div>
+  </nav>
+
+  <div class="flex">
+    <aside class="bg-slate-800 w-48 min-h-screen pt-4">
+      <div id="sidebar"></div>
+    </aside>
+
+    <main class="flex-1 p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h1 class="text-lg font-medium text-slate-700">Shipping</h1>
+        <button id="addBtn" onclick="openModal()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg">
+          <i class="ti ti-plus"></i> New Shipment
+        </button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-1">Ready to ship</p>
+          <p class="text-2xl font-medium text-slate-800">9</p>
+          <p class="text-xs text-blue-400 mt-1">Awaiting dispatch</p>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-1">Shipped today</p>
+          <p class="text-2xl font-medium text-slate-800">31</p>
+          <p class="text-xs text-green-500 mt-1">Dispatched</p>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-1">Delayed</p>
+          <p class="text-2xl font-medium text-red-500">3</p>
+          <p class="text-xs text-red-400 mt-1">Needs attention</p>
+        </div>
+      </div>
+
+      <p class="text-sm font-medium text-slate-600 mb-3">Outgoing shipments</p>
+      <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Shipment ID</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Destination</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Product</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Qty</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Date</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Status</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="shipmentsTable"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-base font-medium text-slate-700">New Shipment</h2>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="ti ti-x text-lg"></i></button>
+      </div>
+      <div class="flex flex-col gap-3">
+        <input id="destination" type="text" placeholder="Destination" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="product" type="text" placeholder="Product name" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="qty" type="number" placeholder="Quantity" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="date" type="date" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <button onclick="addShipment()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 rounded-lg mt-1">Add Shipment</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const user = checkAuth();
+    if (user) {
+      buildSidebar(user);
+      buildNav(user);
+      if (user.role === 'manager') {
+        document.getElementById('addBtn').style.display = 'none';
+      }
+    }
+
+    const isViewOnly = user && user.role === 'manager';
+
+    let shipments = [
+      { id: 'SHP-001', destination: 'Casablanca - Client A', product: 'Electronics - Batch 12', qty: 50, date: '2024-06-18', status: 'shipped' },
+      { id: 'SHP-002', destination: 'Rabat - Client B', product: 'Textiles - Roll 5', qty: 30, date: '2024-06-18', status: 'ready' },
+      { id: 'SHP-003', destination: 'Marrakech - Client C', product: 'Auto Parts - Set B', qty: 20, date: '2024-06-17', status: 'delayed' },
+      { id: 'SHP-004', destination: 'Tanger - Client D', product: 'Food Items - Crate 9', qty: 100, date: '2024-06-17', status: 'shipped' },
+      { id: 'SHP-005', destination: 'Agadir - Client E', product: 'Cosmetics - Pack 3', qty: 15, date: '2024-06-16', status: 'ready' },
+    ];
+
+    function getStatusBadge(status) {
+      if (status === 'shipped') return '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">Shipped</span>';
+      if (status === 'ready') return '<span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">Ready</span>';
+      return '<span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">Delayed</span>';
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('shipmentsTable');
+      tbody.innerHTML = data.map((s, i) => `
+        <tr class="border-b border-slate-100 hover:bg-slate-50">
+          <td class="px-4 py-3 text-slate-500">${s.id}</td>
+          <td class="px-4 py-3 text-slate-700 font-medium">${s.destination}</td>
+          <td class="px-4 py-3 text-slate-600">${s.product}</td>
+          <td class="px-4 py-3 text-slate-600">${s.qty}</td>
+          <td class="px-4 py-3 text-slate-600">${s.date}</td>
+          <td class="px-4 py-3">${getStatusBadge(s.status)}</td>
+          <td class="px-4 py-3 flex gap-2">
+            ${!isViewOnly && s.status === 'ready' ? `<button onclick="markShipped(${i})" class="text-green-500 hover:text-green-700 text-xs flex items-center gap-1"><i class="ti ti-truck"></i> Dispatch</button>` : ''}
+            ${!isViewOnly ? `<button onclick="deleteShipment(${i})" class="text-red-400 hover:text-red-600 text-xs flex items-center gap-1"><i class="ti ti-trash"></i> Delete</button>` : ''}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openModal() { document.getElementById('modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    function addShipment() {
+      const destination = document.getElementById('destination').value;
+      const product = document.getElementById('product').value;
+      const qty = parseInt(document.getElementById('qty').value);
+      const date = document.getElementById('date').value;
+      if (!destination || !product || isNaN(qty) || !date) return alert('Please fill all fields');
+      const id = 'SHP-00' + (shipments.length + 1);
+      shipments.push({ id, destination, product, qty, date, status: 'ready' });
+      closeModal();
+      renderTable(shipments);
+    }
+
+    function markShipped(i) { shipments[i].status = 'shipped'; renderTable(shipments); }
+    function deleteShipment(i) { if (confirm('Delete?')) { shipments.splice(i, 1); renderTable(shipments); } }
+
+    renderTable(shipments);
+  </script>
+</body>
+</html>

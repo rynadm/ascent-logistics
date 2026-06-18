@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventory - Ascent Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <script src="auth.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+  <nav class="bg-slate-900 h-14 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3 text-slate-200 font-medium text-base">
+      <i class="ti ti-truck-delivery text-blue-400 text-xl"></i>
+      Ascent Logistics and Transport
+    </div>
+    <div id="navUser" class="flex items-center gap-3"></div>
+  </nav>
+
+  <div class="flex">
+    <aside class="bg-slate-800 w-48 min-h-screen pt-4">
+      <div id="sidebar"></div>
+    </aside>
+
+    <main class="flex-1 p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h1 class="text-lg font-medium text-slate-700">Inventory</h1>
+        <button id="addBtn" onclick="openModal()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg">
+          <i class="ti ti-plus"></i> Add Product
+        </button>
+      </div>
+
+      <div class="flex gap-3 mb-5">
+        <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 flex-1">
+          <i class="ti ti-search text-slate-400"></i>
+          <input id="searchInput" type="text" placeholder="Search products..." class="outline-none text-sm text-slate-600 w-full" oninput="filterProducts()" />
+        </div>
+        <select id="statusFilter" onchange="filterProducts()" class="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 outline-none">
+          <option value="all">All status</option>
+          <option value="in stock">In Stock</option>
+          <option value="low stock">Low Stock</option>
+          <option value="out of stock">Out of Stock</option>
+        </select>
+      </div>
+
+      <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Product ID</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Product Name</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Category</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Location</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Quantity</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Status</th>
+              <th id="actionsHeader" class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTable"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-base font-medium text-slate-700">Add New Product</h2>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="ti ti-x text-lg"></i></button>
+      </div>
+      <div class="flex flex-col gap-3">
+        <input id="productName" type="text" placeholder="Product name" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="productCategory" type="text" placeholder="Category" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="productLocation" type="text" placeholder="Location (e.g. Zone A - Shelf 3)" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="productQty" type="number" placeholder="Quantity" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <button onclick="addProduct()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 rounded-lg mt-1">Add Product</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const user = checkAuth();
+    if (user) {
+      buildSidebar(user);
+      buildNav(user);
+      // Hide add button for managers (view only)
+      if (user.role === 'manager') {
+        document.getElementById('addBtn').style.display = 'none';
+        document.getElementById('actionsHeader').style.display = 'none';
+      }
+    }
+
+    let products = [
+      { id: 'PRD-001', name: 'Pallet A - Electronics', category: 'Electronics', location: 'Zone A - Shelf 1', qty: 120, status: 'in stock' },
+      { id: 'PRD-002', name: 'Carton B - Textiles', category: 'Textiles', location: 'Zone B - Shelf 4', qty: 8, status: 'low stock' },
+      { id: 'PRD-003', name: 'Box C - Auto Parts', category: 'Auto Parts', location: 'Zone C - Shelf 2', qty: 0, status: 'out of stock' },
+      { id: 'PRD-004', name: 'Crate D - Food Items', category: 'Food', location: 'Zone A - Shelf 5', qty: 54, status: 'in stock' },
+      { id: 'PRD-005', name: 'Package E - Cosmetics', category: 'Cosmetics', location: 'Zone D - Shelf 1', qty: 5, status: 'low stock' },
+    ];
+
+    function getStatusBadge(status) {
+      if (status === 'in stock') return '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">In Stock</span>';
+      if (status === 'low stock') return '<span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full">Low Stock</span>';
+      return '<span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">Out of Stock</span>';
+    }
+
+    function renderTable(data) {
+      const isViewOnly = user && user.role === 'manager';
+      const tbody = document.getElementById('inventoryTable');
+      tbody.innerHTML = data.map((p, i) => `
+        <tr class="border-b border-slate-100 hover:bg-slate-50">
+          <td class="px-4 py-3 text-slate-500">${p.id}</td>
+          <td class="px-4 py-3 text-slate-700 font-medium">${p.name}</td>
+          <td class="px-4 py-3 text-slate-600">${p.category}</td>
+          <td class="px-4 py-3 text-slate-600">${p.location}</td>
+          <td class="px-4 py-3 text-slate-600">${p.qty}</td>
+          <td class="px-4 py-3">${getStatusBadge(p.status)}</td>
+          ${!isViewOnly ? `<td class="px-4 py-3">
+            <button onclick="deleteProduct(${i})" class="text-red-400 hover:text-red-600 text-xs flex items-center gap-1">
+              <i class="ti ti-trash"></i> Delete
+            </button>
+          </td>` : '<td></td>'}
+        </tr>
+      `).join('');
+    }
+
+    function filterProducts() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const filtered = products.filter(p => {
+        const matchSearch = p.name.toLowerCase().includes(search) || p.category.toLowerCase().includes(search);
+        const matchStatus = status === 'all' || p.status === status;
+        return matchSearch && matchStatus;
+      });
+      renderTable(filtered);
+    }
+
+    function openModal() { document.getElementById('modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    function addProduct() {
+      const name = document.getElementById('productName').value;
+      const category = document.getElementById('productCategory').value;
+      const location = document.getElementById('productLocation').value;
+      const qty = parseInt(document.getElementById('productQty').value);
+      if (!name || !category || !location || isNaN(qty)) return alert('Please fill all fields');
+      const status = qty === 0 ? 'out of stock' : qty <= 10 ? 'low stock' : 'in stock';
+      const id = 'PRD-00' + (products.length + 1);
+      products.push({ id, name, category, location, qty, status });
+      closeModal();
+      renderTable(products);
+    }
+
+    function deleteProduct(index) {
+      if (confirm('Delete this product?')) {
+        products.splice(index, 1);
+        renderTable(products);
+      }
+    }
+
+    renderTable(products);
+  </script>
+</body>
+</html>

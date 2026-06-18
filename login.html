@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Ascent Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+</head>
+<body class="bg-slate-900 font-sans min-h-screen flex items-center justify-center">
+
+  <div class="w-full max-w-sm">
+
+    <!-- LOGO -->
+    <div class="flex flex-col items-center mb-8">
+      <div class="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-4">
+        <i class="ti ti-truck-delivery text-blue-400 text-3xl"></i>
+      </div>
+      <h1 class="text-slate-200 text-xl font-medium">Ascent Logistics</h1>
+      <p class="text-slate-500 text-sm mt-1">Sign in to your account</p>
+    </div>
+
+    <!-- LOGIN CARD -->
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+
+      <div id="errorMsg" class="hidden bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 text-red-400 text-sm px-4 py-3 rounded-lg mb-4"></div>
+
+      <div class="flex flex-col gap-4">
+        <div>
+          <label class="text-xs text-slate-400 mb-1.5 block">Email</label>
+          <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-blue-400">
+            <i class="ti ti-mail text-slate-500"></i>
+            <input id="email" type="email" placeholder="your@email.com"
+              class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600"
+              onkeydown="if(event.key==='Enter') login()" />
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 mb-1.5 block">Password</label>
+          <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-blue-400">
+            <i class="ti ti-lock text-slate-500"></i>
+            <input id="password" type="password" placeholder="••••••••"
+              class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600"
+              onkeydown="if(event.key==='Enter') login()" />
+          </div>
+        </div>
+        <button onclick="login()" id="loginBtn"
+          class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-2.5 rounded-lg mt-1 flex items-center justify-center gap-2">
+          <i class="ti ti-login"></i> Sign in
+        </button>
+      </div>
+    </div>
+
+    <p class="text-center text-slate-600 text-xs mt-6">Ascent Logistics and Transport · WMS v1.0</p>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://tqqbsxustgqjngqpupnt.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxcWJzeHVzdGdxam5ncXB1cG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MzAwNjAsImV4cCI6MjA5NzMwNjA2MH0.pYYU7Dg_cZ5pYOeX8WsNhW2ZCCffcvpm9iYplQSFWgY';
+
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+      const btn = document.getElementById('loginBtn');
+
+      if (!email || !password) {
+        showError('Please enter your email and password.');
+        return;
+      }
+
+      btn.innerHTML = '<i class="ti ti-loader animate-spin"></i> Signing in...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(email)}&password=eq.${encodeURIComponent(password)}&active=eq.true&select=*`, {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          }
+        });
+
+        const data = await res.json();
+
+        if (data.length === 0) {
+          showError('Invalid email or password.');
+          btn.innerHTML = '<i class="ti ti-login"></i> Sign in';
+          btn.disabled = false;
+          return;
+        }
+
+        const user = data[0];
+        // Save user session
+        localStorage.setItem('ascent_user', JSON.stringify({
+          id: user.id,
+          full_name: user.full_name,
+          email: user.email,
+          role: user.role
+        }));
+
+        // Redirect based on role
+        if (user.role === 'driver') {
+          window.location.href = 'tracking.html';
+        } else {
+          window.location.href = 'index.html';
+        }
+
+      } catch (err) {
+        showError('Connection error. Please try again.');
+        btn.innerHTML = '<i class="ti ti-login"></i> Sign in';
+        btn.disabled = false;
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    // If already logged in, redirect
+    if (localStorage.getItem('ascent_user')) {
+      window.location.href = 'index.html';
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Receiving - Ascent Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <script src="auth.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+  <nav class="bg-slate-900 h-14 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3 text-slate-200 font-medium text-base">
+      <i class="ti ti-truck-delivery text-blue-400 text-xl"></i>
+      Ascent Logistics and Transport
+    </div>
+    <div id="navUser" class="flex items-center gap-3"></div>
+  </nav>
+
+  <div class="flex">
+    <aside class="bg-slate-800 w-48 min-h-screen pt-4">
+      <div id="sidebar"></div>
+    </aside>
+
+    <main class="flex-1 p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h1 class="text-lg font-medium text-slate-700">Receiving</h1>
+        <button id="addBtn" onclick="openModal()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg">
+          <i class="ti ti-plus"></i> New Receipt
+        </button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-1">Expected today</p>
+          <p class="text-2xl font-medium text-slate-800">6</p>
+          <p class="text-xs text-blue-400 mt-1">Shipments incoming</p>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-1">Received today</p>
+          <p class="text-2xl font-medium text-slate-800">4</p>
+          <p class="text-xs text-green-500 mt-1">Processed</p>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-1">Pending inspection</p>
+          <p class="text-2xl font-medium text-yellow-500">2</p>
+          <p class="text-xs text-yellow-400 mt-1">Awaiting check</p>
+        </div>
+      </div>
+
+      <p class="text-sm font-medium text-slate-600 mb-3">Incoming shipments</p>
+      <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Receipt ID</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Supplier</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Product</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Qty</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Date</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Status</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="receiptsTable"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-base font-medium text-slate-700">New Receipt</h2>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="ti ti-x text-lg"></i></button>
+      </div>
+      <div class="flex flex-col gap-3">
+        <input id="supplier" type="text" placeholder="Supplier name" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="product" type="text" placeholder="Product name" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="qty" type="number" placeholder="Quantity" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <input id="date" type="date" class="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400" />
+        <button onclick="addReceipt()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 rounded-lg mt-1">Add Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const user = checkAuth();
+    if (user) {
+      buildSidebar(user);
+      buildNav(user);
+      if (user.role === 'manager') {
+        document.getElementById('addBtn').style.display = 'none';
+      }
+    }
+
+    let receipts = [
+      { id: 'RCV-001', supplier: 'TechSupply Co.', product: 'Electronics - Batch 12', qty: 200, date: '2024-06-18', status: 'received' },
+      { id: 'RCV-002', supplier: 'TextilePro', product: 'Textiles - Roll 5', qty: 80, date: '2024-06-18', status: 'pending' },
+      { id: 'RCV-003', supplier: 'AutoParts Ltd.', product: 'Auto Parts - Set B', qty: 45, date: '2024-06-17', status: 'received' },
+      { id: 'RCV-004', supplier: 'FoodLogix', product: 'Food Items - Crate 9', qty: 300, date: '2024-06-17', status: 'pending' },
+    ];
+
+    const isViewOnly = user && user.role === 'manager';
+
+    function getStatusBadge(status) {
+      if (status === 'received') return '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">Received</span>';
+      if (status === 'pending') return '<span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full">Pending</span>';
+      return '<span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">Rejected</span>';
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('receiptsTable');
+      tbody.innerHTML = data.map((r, i) => `
+        <tr class="border-b border-slate-100 hover:bg-slate-50">
+          <td class="px-4 py-3 text-slate-500">${r.id}</td>
+          <td class="px-4 py-3 text-slate-700 font-medium">${r.supplier}</td>
+          <td class="px-4 py-3 text-slate-600">${r.product}</td>
+          <td class="px-4 py-3 text-slate-600">${r.qty}</td>
+          <td class="px-4 py-3 text-slate-600">${r.date}</td>
+          <td class="px-4 py-3">${getStatusBadge(r.status)}</td>
+          <td class="px-4 py-3 flex gap-2">
+            ${!isViewOnly && r.status === 'pending' ? `<button onclick="markReceived(${i})" class="text-green-500 hover:text-green-700 text-xs flex items-center gap-1"><i class="ti ti-check"></i> Confirm</button>` : ''}
+            ${!isViewOnly ? `<button onclick="deleteReceipt(${i})" class="text-red-400 hover:text-red-600 text-xs flex items-center gap-1"><i class="ti ti-trash"></i> Delete</button>` : ''}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openModal() { document.getElementById('modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    function addReceipt() {
+      const supplier = document.getElementById('supplier').value;
+      const product = document.getElementById('product').value;
+      const qty = parseInt(document.getElementById('qty').value);
+      const date = document.getElementById('date').value;
+      if (!supplier || !product || isNaN(qty) || !date) return alert('Please fill all fields');
+      const id = 'RCV-00' + (receipts.length + 1);
+      receipts.push({ id, supplier, product, qty, date, status: 'pending' });
+      closeModal();
+      renderTable(receipts);
+    }
+
+    function markReceived(i) { receipts[i].status = 'received'; renderTable(receipts); }
+    function deleteReceipt(i) { if (confirm('Delete?')) { receipts.splice(i, 1); renderTable(receipts); } }
+
+    renderTable(receipts);
+  </script>
+</body>
+</html>

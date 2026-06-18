@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Assistant - Ascent Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <script src="auth.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+  <nav class="bg-slate-900 h-14 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3 text-slate-200 font-medium text-base">
+      <i class="ti ti-truck-delivery text-blue-400 text-xl"></i>
+      Ascent Logistics and Transport
+    </div>
+    <div id="navUser" class="flex items-center gap-3"></div>
+  </nav>
+
+  <div class="flex">
+    <aside class="bg-slate-800 w-48 min-h-screen pt-4">
+      <div id="sidebar"></div>
+    </aside>
+
+    <main class="flex-1 flex flex-col p-6 pb-0" style="height: calc(100vh - 56px);">
+      <h1 class="text-lg font-medium text-slate-700 mb-4">AI Assistant</h1>
+
+      <div class="flex gap-2 mb-4 flex-wrap" id="suggestions"></div>
+
+      <div id="chatBox" class="flex-1 overflow-y-auto flex flex-col gap-4 bg-white border border-slate-200 rounded-xl p-4 mb-4">
+        <div class="flex gap-3">
+          <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0">
+            <i class="ti ti-robot text-blue-400 text-sm"></i>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl rounded-tl-none px-4 py-3 max-w-xl">
+            <p class="text-sm text-slate-700" id="welcomeMsg">Hello! I'm your Ascent warehouse assistant. Ask me anything!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-xl flex items-center gap-3 px-4 py-3 mb-6">
+        <input id="userInput" type="text" placeholder="Ask about your warehouse..."
+          class="flex-1 outline-none text-sm text-slate-600"
+          onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm flex items-center gap-2">
+          <i class="ti ti-send"></i> Send
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE';
+
+    const user = checkAuth();
+    if (user) {
+      buildSidebar(user);
+      buildNav(user);
+      document.getElementById('welcomeMsg').textContent =
+        `Hello ${user.full_name}! I'm your Ascent warehouse assistant. Ask me anything about your warehouse!`;
+    }
+
+    const suggestionsByRole = {
+      admin:    ['Which products are low on stock?', 'How many orders shipped today?', 'Give me a full warehouse report', 'Which shipments are delayed?'],
+      manager:  ['Show me inventory summary', 'Which products need reordering?', 'Give me a performance report', 'Which orders are delayed?'],
+      operator: ['What do I need to receive today?', 'Which shipments are ready to dispatch?', 'Show pending receipts', 'What orders are processing?'],
+      driver:   ['Which orders are assigned to me?', 'Show delivered orders today', 'Any delayed shipments?', 'What is the status of ORD-002?'],
+    };
+
+    const warehouseData = {
+      inventory: [
+        { id: 'PRD-001', name: 'Electronics - Batch 12', qty: 120, status: 'in stock', location: 'Zone A - Shelf 1' },
+        { id: 'PRD-002', name: 'Textiles - Roll 5', qty: 8, status: 'low stock', location: 'Zone B - Shelf 4' },
+        { id: 'PRD-003', name: 'Auto Parts - Set B', qty: 0, status: 'out of stock', location: 'Zone C - Shelf 2' },
+        { id: 'PRD-004', name: 'Food Items - Crate 9', qty: 54, status: 'in stock', location: 'Zone A - Shelf 5' },
+        { id: 'PRD-005', name: 'Cosmetics - Pack 3', qty: 5, status: 'low stock', location: 'Zone D - Shelf 1' },
+      ],
+      orders: [
+        { id: 'ORD-001', client: 'Client A - Casablanca', product: 'Electronics', qty: 50, status: 'delivered' },
+        { id: 'ORD-002', client: 'Client B - Rabat', product: 'Textiles', qty: 30, status: 'dispatched' },
+        { id: 'ORD-003', client: 'Client C - Marrakech', product: 'Auto Parts', qty: 20, status: 'processing' },
+        { id: 'ORD-004', client: 'Client D - Tanger', product: 'Food Items', qty: 100, status: 'delivered' },
+        { id: 'ORD-005', client: 'Client E - Agadir', product: 'Cosmetics', qty: 15, status: 'placed' },
+      ],
+      shipments: [
+        { id: 'SHP-001', destination: 'Casablanca', product: 'Electronics', qty: 50, status: 'shipped' },
+        { id: 'SHP-002', destination: 'Rabat', product: 'Textiles', qty: 30, status: 'ready' },
+        { id: 'SHP-003', destination: 'Marrakech', product: 'Auto Parts', qty: 20, status: 'delayed' },
+        { id: 'SHP-004', destination: 'Tanger', product: 'Food Items', qty: 100, status: 'shipped' },
+        { id: 'SHP-005', destination: 'Agadir', product: 'Cosmetics', qty: 15, status: 'ready' },
+      ]
+    };
+
+    // Build suggestion buttons based on role
+    const suggestions = suggestionsByRole[user?.role] || suggestionsByRole.operator;
+    document.getElementById('suggestions').innerHTML = suggestions.map(s => `
+      <button onclick="askSuggestion(this)" class="bg-white border border-slate-200 text-slate-600 text-xs px-3 py-1.5 rounded-full hover:border-blue-400 hover:text-blue-600">
+        ${s}
+      </button>
+    `).join('');
+
+    const systemPrompt = `You are a helpful warehouse assistant for Ascent Logistics and Transport.
+The user's name is ${user?.full_name} and their role is ${user?.role}.
+Tailor your answers to their role. A driver only needs delivery info. An operator needs receiving/shipping info. A manager needs overview and reports. An admin gets everything.
+
+WAREHOUSE DATA:
+INVENTORY: ${JSON.stringify(warehouseData.inventory)}
+ORDERS: ${JSON.stringify(warehouseData.orders)}
+SHIPMENTS: ${JSON.stringify(warehouseData.shipments)}
+
+Be concise, professional, and helpful. Format reports clearly.`;
+
+    let messages = [];
+
+    function appendMessage(role, text) {
+      const chatBox = document.getElementById('chatBox');
+      const isUser = role === 'user';
+      const div = document.createElement('div');
+      div.className = `flex gap-3 ${isUser ? 'justify-end' : ''}`;
+      div.innerHTML = isUser ? `
+        <div class="bg-blue-600 text-white rounded-xl rounded-tr-none px-4 py-3 max-w-xl">
+          <p class="text-sm">${text}</p>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
+          <i class="ti ti-user text-slate-300 text-sm"></i>
+        </div>
+      ` : `
+        <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0">
+          <i class="ti ti-robot text-blue-400 text-sm"></i>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl rounded-tl-none px-4 py-3 max-w-xl">
+          <p class="text-sm text-slate-700 whitespace-pre-line">${text}</p>
+        </div>
+      `;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function appendTyping() {
+      const chatBox = document.getElementById('chatBox');
+      const div = document.createElement('div');
+      div.id = 'typing';
+      div.className = 'flex gap-3';
+      div.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0">
+          <i class="ti ti-robot text-blue-400 text-sm"></i>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl rounded-tl-none px-4 py-3">
+          <p class="text-sm text-slate-400 italic">Thinking...</p>
+        </div>
+      `;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      appendMessage('user', text);
+      messages.push({ role: 'user', content: text });
+      appendTyping();
+
+      try {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${GROQ_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'llama3-8b-8192',
+            messages: [{ role: 'system', content: systemPrompt }, ...messages]
+          })
+        });
+        const data = await response.json();
+        const reply = data.choices[0].message.content;
+        document.getElementById('typing')?.remove();
+        appendMessage('assistant', reply);
+        messages.push({ role: 'assistant', content: reply });
+      } catch (err) {
+        document.getElementById('typing')?.remove();
+        appendMessage('assistant', 'Sorry, I could not connect. Please check your Groq API key.');
+      }
+    }
+
+    function askSuggestion(btn) {
+      document.getElementById('userInput').value = btn.textContent.trim();
+      sendMessage();
+    }
+  </script>
+</body>
+</html>
