@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reports - Ascent Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+  <script src="auth.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+  <nav class="bg-slate-900 h-14 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3 text-slate-200 font-medium text-base">
+      <i class="ti ti-truck-delivery text-blue-400 text-xl"></i>
+      Ascent Logistics and Transport
+    </div>
+    <div id="navUser" class="flex items-center gap-3"></div>
+  </nav>
+
+  <div class="flex">
+    <aside class="bg-slate-800 w-48 min-h-screen pt-4">
+      <div id="sidebar"></div>
+    </aside>
+
+    <main class="flex-1 p-6">
+      <h1 class="text-lg font-medium text-slate-700 mb-6">Reports</h1>
+
+      <!-- REPORT CARDS -->
+      <div class="grid grid-cols-3 gap-5 mb-8">
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+          <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4">
+            <i class="ti ti-box text-blue-500 text-xl"></i>
+          </div>
+          <h2 class="text-sm font-medium text-slate-700 mb-1">Inventory Report</h2>
+          <p class="text-xs text-slate-400 mb-4">Full list of all products, quantities and stock status</p>
+          <button onclick="exportInventory()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 rounded-lg flex items-center justify-center gap-2">
+            <i class="ti ti-file-type-pdf"></i> Export PDF
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+          <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center mb-4">
+            <i class="ti ti-package-export text-green-500 text-xl"></i>
+          </div>
+          <h2 class="text-sm font-medium text-slate-700 mb-1">Shipments Report</h2>
+          <p class="text-xs text-slate-400 mb-4">All outgoing shipments with destinations and status</p>
+          <button onclick="exportShipments()" class="w-full bg-green-600 hover:bg-green-700 text-white text-sm py-2 rounded-lg flex items-center justify-center gap-2">
+            <i class="ti ti-file-type-pdf"></i> Export PDF
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+          <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center mb-4">
+            <i class="ti ti-chart-bar text-purple-500 text-xl"></i>
+          </div>
+          <h2 class="text-sm font-medium text-slate-700 mb-1">Full Warehouse Report</h2>
+          <p class="text-xs text-slate-400 mb-4">Complete summary of inventory, orders and shipments</p>
+          <button onclick="exportFull()" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm py-2 rounded-lg flex items-center justify-center gap-2">
+            <i class="ti ti-file-type-pdf"></i> Export PDF
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+          <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center mb-4">
+            <i class="ti ti-truck text-yellow-500 text-xl"></i>
+          </div>
+          <h2 class="text-sm font-medium text-slate-700 mb-1">Receiving Report</h2>
+          <p class="text-xs text-slate-400 mb-4">All incoming shipments from suppliers with status</p>
+          <button onclick="exportReceiving()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white text-sm py-2 rounded-lg flex items-center justify-center gap-2">
+            <i class="ti ti-file-type-pdf"></i> Export PDF
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+          <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center mb-4">
+            <i class="ti ti-alert-triangle text-red-500 text-xl"></i>
+          </div>
+          <h2 class="text-sm font-medium text-slate-700 mb-1">Low Stock Alert Report</h2>
+          <p class="text-xs text-slate-400 mb-4">Products that are low or out of stock needing reorder</p>
+          <button onclick="exportLowStock()" class="w-full bg-red-600 hover:bg-red-700 text-white text-sm py-2 rounded-lg flex items-center justify-center gap-2">
+            <i class="ti ti-file-type-pdf"></i> Export PDF
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+          <div class="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center mb-4">
+            <i class="ti ti-map-pin text-slate-500 text-xl"></i>
+          </div>
+          <h2 class="text-sm font-medium text-slate-700 mb-1">Orders Report</h2>
+          <p class="text-xs text-slate-400 mb-4">All orders with tracking status and client details</p>
+          <button onclick="exportOrders()" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-sm py-2 rounded-lg flex items-center justify-center gap-2">
+            <i class="ti ti-file-type-pdf"></i> Export PDF
+          </button>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const user = checkAuth();
+    if (user) {
+      buildSidebar(user);
+      buildNav(user);
+    }
+
+    // Data
+    const inventory = [
+      { id: 'PRD-001', name: 'Electronics - Batch 12', category: 'Electronics', location: 'Zone A - Shelf 1', qty: 120, status: 'In Stock' },
+      { id: 'PRD-002', name: 'Textiles - Roll 5', category: 'Textiles', location: 'Zone B - Shelf 4', qty: 8, status: 'Low Stock' },
+      { id: 'PRD-003', name: 'Auto Parts - Set B', category: 'Auto Parts', location: 'Zone C - Shelf 2', qty: 0, status: 'Out of Stock' },
+      { id: 'PRD-004', name: 'Food Items - Crate 9', category: 'Food', location: 'Zone A - Shelf 5', qty: 54, status: 'In Stock' },
+      { id: 'PRD-005', name: 'Cosmetics - Pack 3', category: 'Cosmetics', location: 'Zone D - Shelf 1', qty: 5, status: 'Low Stock' },
+    ];
+
+    const shipments = [
+      { id: 'SHP-001', destination: 'Casablanca - Client A', product: 'Electronics', qty: 50, date: '2024-06-18', status: 'Shipped' },
+      { id: 'SHP-002', destination: 'Rabat - Client B', product: 'Textiles', qty: 30, date: '2024-06-18', status: 'Ready' },
+      { id: 'SHP-003', destination: 'Marrakech - Client C', product: 'Auto Parts', qty: 20, date: '2024-06-17', status: 'Delayed' },
+      { id: 'SHP-004', destination: 'Tanger - Client D', product: 'Food Items', qty: 100, date: '2024-06-17', status: 'Shipped' },
+      { id: 'SHP-005', destination: 'Agadir - Client E', product: 'Cosmetics', qty: 15, date: '2024-06-16', status: 'Ready' },
+    ];
+
+    const receipts = [
+      { id: 'RCV-001', supplier: 'TechSupply Co.', product: 'Electronics - Batch 12', qty: 200, date: '2024-06-18', status: 'Received' },
+      { id: 'RCV-002', supplier: 'TextilePro', product: 'Textiles - Roll 5', qty: 80, date: '2024-06-18', status: 'Pending' },
+      { id: 'RCV-003', supplier: 'AutoParts Ltd.', product: 'Auto Parts - Set B', qty: 45, date: '2024-06-17', status: 'Received' },
+      { id: 'RCV-004', supplier: 'FoodLogix', product: 'Food Items - Crate 9', qty: 300, date: '2024-06-17', status: 'Pending' },
+    ];
+
+    const orders = [
+      { id: 'ORD-001', client: 'Client A - Casablanca', product: 'Electronics', qty: 50, date: '2024-06-18', status: 'Delivered' },
+      { id: 'ORD-002', client: 'Client B - Rabat', product: 'Textiles', qty: 30, date: '2024-06-18', status: 'Dispatched' },
+      { id: 'ORD-003', client: 'Client C - Marrakech', product: 'Auto Parts', qty: 20, date: '2024-06-17', status: 'Processing' },
+      { id: 'ORD-004', client: 'Client D - Tanger', product: 'Food Items', qty: 100, date: '2024-06-17', status: 'Delivered' },
+      { id: 'ORD-005', client: 'Client E - Agadir', product: 'Cosmetics', qty: 15, date: '2024-06-16', status: 'Placed' },
+    ];
+
+    function createPDF(title) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const date = new Date().toLocaleDateString();
+
+      // Header
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 0, 210, 30, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Ascent Logistics and Transport', 14, 13);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(title, 14, 22);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Generated: ${date}`, 150, 22);
+
+      doc.setTextColor(0, 0, 0);
+      return doc;
+    }
+
+    function exportInventory() {
+      const doc = createPDF('Inventory Report');
+      doc.autoTable({
+        startY: 40,
+        head: [['Product ID', 'Name', 'Category', 'Location', 'Qty', 'Status']],
+        body: inventory.map(p => [p.id, p.name, p.category, p.location, p.qty, p.status]),
+        headStyles: { fillColor: [30, 41, 59], textColor: 255 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+      });
+      doc.save('inventory-report.pdf');
+    }
+
+    function exportShipments() {
+      const doc = createPDF('Shipments Report');
+      doc.autoTable({
+        startY: 40,
+        head: [['Shipment ID', 'Destination', 'Product', 'Qty', 'Date', 'Status']],
+        body: shipments.map(s => [s.id, s.destination, s.product, s.qty, s.date, s.status]),
+        headStyles: { fillColor: [21, 128, 61], textColor: 255 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+      });
+      doc.save('shipments-report.pdf');
+    }
+
+    function exportReceiving() {
+      const doc = createPDF('Receiving Report');
+      doc.autoTable({
+        startY: 40,
+        head: [['Receipt ID', 'Supplier', 'Product', 'Qty', 'Date', 'Status']],
+        body: receipts.map(r => [r.id, r.supplier, r.product, r.qty, r.date, r.status]),
+        headStyles: { fillColor: [161, 98, 7], textColor: 255 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+      });
+      doc.save('receiving-report.pdf');
+    }
+
+    function exportOrders() {
+      const doc = createPDF('Orders Report');
+      doc.autoTable({
+        startY: 40,
+        head: [['Order ID', 'Client', 'Product', 'Qty', 'Date', 'Status']],
+        body: orders.map(o => [o.id, o.client, o.product, o.qty, o.date, o.status]),
+        headStyles: { fillColor: [71, 85, 105], textColor: 255 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+      });
+      doc.save('orders-report.pdf');
+    }
+
+    function exportLowStock() {
+      const low = inventory.filter(p => p.status !== 'In Stock');
+      const doc = createPDF('Low Stock Alert Report');
+      doc.setFontSize(11);
+      doc.setTextColor(220, 38, 38);
+      doc.text(`⚠ ${low.length} products need attention`, 14, 38);
+      doc.setTextColor(0, 0, 0);
+      doc.autoTable({
+        startY: 45,
+        head: [['Product ID', 'Name', 'Category', 'Location', 'Qty', 'Status']],
+        body: low.map(p => [p.id, p.name, p.category, p.location, p.qty, p.status]),
+        headStyles: { fillColor: [185, 28, 28], textColor: 255 },
+        alternateRowStyles: { fillColor: [254, 242, 242] },
+      });
+      doc.save('low-stock-report.pdf');
+    }
+
+    function exportFull() {
+      const doc = createPDF('Full Warehouse Report');
+      let y = 40;
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('1. Inventory Summary', 14, y);
+      doc.setFont('helvetica', 'normal');
+      y += 5;
+
+      doc.autoTable({
+        startY: y,
+        head: [['Product ID', 'Name', 'Qty', 'Status']],
+        body: inventory.map(p => [p.id, p.name, p.qty, p.status]),
+        headStyles: { fillColor: [30, 41, 59], textColor: 255 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+      });
+
+      y = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('2. Shipments Summary', 14, y);
+      doc.setFont('helvetica', 'normal');
+      y += 5;
+
+      doc.autoTable({
+        startY: y,
+        head: [['Shipment ID', 'Destination', 'Qty', 'Status']],
+        body: shipments.map(s => [s.id, s.destination, s.qty, s.status]),
+        headStyles: { fillColor: [30, 41, 59], textColor: 255 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+      });
+
+      y = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('3. Orders Summary', 14, y);
+      doc.setFont('helvetica', 'normal');
+      y += 5;
+
+      doc.autoTable({
+        startY: y,
+        head: [['Order ID', 'Client', 'Qty', 'Status']],
+        body: orders.map(o => [o.id, o.client, o.qty, o.status]),
+        headStyles: { fillColor: [30, 41, 59], textColor: 255 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+      });
+
+      doc.save('full-warehouse-report.pdf');
+    }
+  </script>
+</body>
+</html>
