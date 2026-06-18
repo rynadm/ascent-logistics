@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script>
+  if (!localStorage.getItem('ascent_user')) {
+    window.location.href = 'login.html';
+  }
+</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard - Ascent Logistics</title>
   <script src="https://cdn.tailwindcss.com"></script>
