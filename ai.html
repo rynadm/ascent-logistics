@@ -51,9 +51,6 @@
   </div>
 
   <script>
-    const GROQ_API_KEY =  const GROQ_API_KEY = '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';
-';
-
     const user = checkAuth();
     if (user) {
       buildSidebar(user);
@@ -61,6 +58,8 @@
       document.getElementById('welcomeMsg').textContent =
         `Hello ${user.full_name}! I'm your Ascent warehouse assistant. Ask me anything about your warehouse!`;
     }
+
+    const GROQ_API_KEY = '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';
 
     const suggestionsByRole = {
       admin:    ['Which products are low on stock?', 'How many orders shipped today?', 'Give me a full warehouse report', 'Which shipments are delayed?'],
@@ -93,7 +92,6 @@
       ]
     };
 
-    // Build suggestion buttons based on role
     const suggestions = suggestionsByRole[user?.role] || suggestionsByRole.operator;
     document.getElementById('suggestions').innerHTML = suggestions.map(s => `
       <button onclick="askSuggestion(this)" class="bg-white border border-slate-200 text-slate-600 text-xs px-3 py-1.5 rounded-full hover:border-blue-400 hover:text-blue-600">
