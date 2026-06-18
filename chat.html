@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Team Chat - Ascent Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <script src="auth.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+  <nav class="bg-slate-900 h-14 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3 text-slate-200 font-medium text-base">
+      <i class="ti ti-truck-delivery text-blue-400 text-xl"></i>
+      Ascent Logistics and Transport
+    </div>
+    <div id="navUser" class="flex items-center gap-3"></div>
+  </nav>
+
+  <div class="flex">
+    <aside class="bg-slate-800 w-48 min-h-screen pt-4">
+      <div id="sidebar"></div>
+    </aside>
+
+    <main class="flex-1 flex flex-col p-6 pb-0" style="height: calc(100vh - 56px);">
+      <h1 class="text-lg font-medium text-slate-700 mb-4">Team Chat</h1>
+
+      <!-- ONLINE USERS -->
+      <div class="flex items-center gap-3 mb-4 bg-white border border-slate-200 rounded-xl px-4 py-3">
+        <p class="text-xs text-slate-400 mr-2">Online:</p>
+        <div id="onlineUsers" class="flex gap-2 flex-wrap"></div>
+      </div>
+
+      <!-- CHAT MESSAGES -->
+      <div id="chatBox" class="flex-1 overflow-y-auto flex flex-col gap-3 bg-white border border-slate-200 rounded-xl p-4 mb-4"></div>
+
+      <!-- INPUT BAR -->
+      <div class="bg-white border border-slate-200 rounded-xl flex items-center gap-3 px-4 py-3 mb-6">
+        <input id="msgInput" type="text" placeholder="Type a message..."
+          class="flex-1 outline-none text-sm text-slate-600"
+          onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm flex items-center gap-2">
+          <i class="ti ti-send"></i> Send
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://tqqbsxustgqjngqpupnt.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxcWJzeHVzdGdxam5ncXB1cG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MzAwNjAsImV4cCI6MjA5NzMwNjA2MH0.pYYU7Dg_cZ5pYOeX8WsNhW2ZCCffcvpm9iYplQSFWgY';
+
+    const user = checkAuth();
+    if (user) {
+      buildSidebar(user);
+      buildNav(user);
+    }
+
+    // Create chat table in Supabase first
+    async function setupAndLoad() {
+      await loadMessages();
+      setInterval(loadMessages, 3000); // refresh every 3 seconds
+      markOnline();
+      setInterval(markOnline, 10000); // update online status every 10 seconds
+    }
+
+    async function loadMessages() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?select=*&order=created_at.asc&limit=100`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const data = await res.json();
+        if (Array.isArray(data)) renderMessages(data);
+      } catch (err) {
+        console.error('Failed to load messages', err);
+      }
+    }
+
+    async function markOnline() {
+      try {
+        // Upsert presence
+        await fetch(`${SUPABASE_URL}/rest/v1/presence`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify({
+            user_id: user.id,
+            full_name: user.full_name,
+            role: user.role,
+            last_seen: new Date().toISOString()
+          })
+        });
+        loadOnlineUsers();
+      } catch (err) {}
+    }
+
+    async function loadOnlineUsers() {
+      try {
+        // Users seen in last 30 seconds are "online"
+        const since = new Date(Date.now() - 30000).toISOString();
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/presence?last_seen=gte.${since}&select=*`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const data = await res.json();
+        if (Array.isArray(data)) renderOnlineUsers(data);
+      } catch (err) {}
+    }
+
+    function renderOnlineUsers(users) {
+      const roleColors = {
+        admin: 'bg-purple-100 text-purple-700',
+        manager: 'bg-blue-100 text-blue-700',
+        operator: 'bg-green-100 text-green-700',
+        driver: 'bg-yellow-100 text-yellow-700',
+      };
+      document.getElementById('onlineUsers').innerHTML = users.map(u => `
+        <div class="flex items-center gap-1.5">
+          <div class="w-2 h-2 rounded-full bg-green-400"></div>
+          <span class="text-xs ${roleColors[u.role] || 'bg-slate-100 text-slate-600'} px-2 py-0.5 rounded-full">${u.full_name}</span>
+        </div>
+      `).join('');
+    }
+
+    let lastCount = 0;
+    function renderMessages(messages) {
+      if (messages.length === lastCount) return;
+      lastCount = messages.length;
+      const chatBox = document.getElementById('chatBox');
+      const isAtBottom = chatBox.scrollHeight - chatBox.scrollTop <= chatBox.clientHeight + 50;
+
+      chatBox.innerHTML = messages.map(m => {
+        const isMe = m.user_id === user.id;
+        const roleColors = {
+          admin: 'text-purple-500',
+          manager: 'text-blue-500',
+          operator: 'text-green-500',
+          driver: 'text-yellow-500',
+        };
+        const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `
+          <div class="flex gap-3 ${isMe ? 'justify-end' : ''}">
+            ${!isMe ? `
+              <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 text-xs font-medium text-slate-600">
+                ${m.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2)}
+              </div>
+            ` : ''}
+            <div class="max-w-xs">
+              ${!isMe ? `<p class="text-xs ${roleColors[m.role] || 'text-slate-400'} mb-1 font-medium">${m.full_name} · <span class="text-slate-400 font-normal capitalize">${m.role}</span></p>` : ''}
+              <div class="${isMe ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'} rounded-xl ${isMe ? 'rounded-tr-none' : 'rounded-tl-none'} px-4 py-2.5">
+                <p class="text-sm">${m.content}</p>
+              </div>
+              <p class="text-xs text-slate-400 mt-1 ${isMe ? 'text-right' : ''}">${time}</p>
+            </div>
+            ${isMe ? `
+              <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 text-xs font-medium text-blue-600">
+                ${user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2)}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      if (isAtBottom) chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('msgInput');
+      const content = input.value.trim();
+      if (!content) return;
+      input.value = '';
+
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            user_id: user.id,
+            full_name: user.full_name,
+            role: user.role,
+            content
+          })
+        });
+        loadMessages();
+      } catch (err) {
+        console.error('Failed to send message', err);
+      }
+    }
+
+    setupAndLoad();
+  </script>
+</body>
+</html>
