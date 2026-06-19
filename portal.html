@@ -866,11 +866,13 @@ Be warm, helpful, and professional. Respond in the customer's language.`
     const savedWorker = localStorage.getItem('ascent_user');
     if (savedWorker) window.location.href = 'index.html';
 
-    const savedCustomer = localStorage.getItem('customer_session');
-    if (savedCustomer) {
-      currentCustomer = JSON.parse(savedCustomer);
-      showCustomerSection();
-    }
+    // ─── SESSION CHECK ────────────────────────────────────────
+const savedCustomer = localStorage.getItem('customer_session');
+if (savedCustomer) {
+  currentCustomer = JSON.parse(savedCustomer);
+  showCustomerSection();
+}
+// Note: we no longer auto-redirect workers so the portal always shows
   </script>
 
 </body>
