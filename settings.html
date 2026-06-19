@@ -115,7 +115,41 @@
           </div>
         </div>
       </div>
-
+<!-- RESET SECTION - ADMIN ONLY -->
+      <div id="resetSection" class="bg-white rounded-xl border border-red-200 p-6 mb-5 hidden">
+        <h2 class="text-sm font-medium text-red-600 mb-4 flex items-center gap-2">
+          <i class="ti ti-alert-triangle text-red-500"></i> Danger Zone
+        </h2>
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between py-3 border-b border-slate-100">
+            <div>
+              <p class="text-sm text-slate-700">Reset all notifications</p>
+              <p class="text-xs text-slate-400">Clear all notification preferences</p>
+            </div>
+            <button onclick="resetNotifications()" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs px-3 py-1.5 rounded-lg border border-red-200">
+              Reset
+            </button>
+          </div>
+          <div class="flex items-center justify-between py-3 border-b border-slate-100">
+            <div>
+              <p class="text-sm text-slate-700">Reset warehouse settings</p>
+              <p class="text-xs text-slate-400">Restore all warehouse settings to default</p>
+            </div>
+            <button onclick="resetWarehouse()" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs px-3 py-1.5 rounded-lg border border-red-200">
+              Reset
+            </button>
+          </div>
+          <div class="flex items-center justify-between py-3">
+            <div>
+              <p class="text-sm font-medium text-red-600">Reset entire system</p>
+              <p class="text-xs text-slate-400">Clears all local settings and logs you out</p>
+            </div>
+            <button onclick="resetAll()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg">
+              Full Reset
+            </button>
+          </div>
+        </div>
+      </div>
       <div class="bg-slate-800 rounded-xl p-6">
         <div class="flex items-center gap-3 mb-2">
           <i class="ti ti-truck-delivery text-blue-400 text-xl"></i>
@@ -139,6 +173,30 @@
 
     function saveProfile() {
       alert('Profile saved!');
+    }
+    // Show reset section only for admin
+    if (user && user.role === 'admin') {
+      document.getElementById('resetSection').classList.remove('hidden');
+    }
+
+    function resetNotifications() {
+      if (confirm('Reset all notification settings?')) {
+        document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+        alert('Notifications reset.');
+      }
+    }
+
+    function resetWarehouse() {
+      if (confirm('Reset warehouse settings to default?')) {
+        alert('Warehouse settings reset to default.');
+      }
+    }
+
+    function resetAll() {
+      if (confirm('This will reset everything and log you out. Are you sure?')) {
+        localStorage.clear();
+        window.location.href = 'login.html';
+      }
     }
   </script>
 </body>

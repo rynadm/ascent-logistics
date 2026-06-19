@@ -34,6 +34,9 @@
         </div>
       </div>
 
+      <!-- 30 MIN ALERTS -->
+      <div id="arrivalAlerts" class="flex flex-col gap-2 mb-5"></div>
+
       <!-- STAT CARDS -->
       <div class="grid grid-cols-4 gap-4 mb-5">
         <div class="bg-white rounded-lg border border-slate-200 p-4">
@@ -58,39 +61,52 @@
         </div>
       </div>
 
-      <div class="flex gap-5">
-
+      <div class="flex gap-5 mb-6">
         <!-- MAP -->
         <div class="flex-1">
-          <div id="map" class="rounded-xl border border-slate-200 overflow-hidden" style="height: 480px;"></div>
+          <div id="map" class="rounded-xl border border-slate-200 overflow-hidden" style="height: 460px;"></div>
         </div>
 
         <!-- DRIVER LIST -->
-        <div class="w-72 flex flex-col gap-3">
-          <p class="text-sm font-medium text-slate-600">Active drivers</p>
+        <div class="w-80 flex flex-col gap-3 overflow-y-auto" style="max-height:460px;">
+          <p class="text-sm font-medium text-slate-600">Active trucks</p>
           <div id="driverList" class="flex flex-col gap-3"></div>
         </div>
-
       </div>
 
       <!-- DELIVERIES TABLE -->
-      <p class="text-sm font-medium text-slate-600 mt-6 mb-3">Today's deliveries</p>
+      <p class="text-sm font-medium text-slate-600 mb-3">Today's deliveries</p>
       <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Order ID</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Order</th>
               <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Driver</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Plate</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Container</th>
               <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Destination</th>
               <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">ETA</th>
+              <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Fuel</th>
               <th class="text-left px-4 py-3 text-xs text-slate-500 font-medium">Status</th>
             </tr>
           </thead>
           <tbody id="deliveriesTable"></tbody>
         </table>
       </div>
-
     </main>
+  </div>
+
+  <!-- TRUCK DETAIL MODAL -->
+  <div id="truckModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-base font-medium text-slate-700" id="modalTitle">Truck Details</h2>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="ti ti-x text-lg"></i>
+        </button>
+      </div>
+      <div id="modalContent"></div>
+    </div>
   </div>
 
   <script>
@@ -100,30 +116,20 @@
       buildNav(user);
     }
 
-    // Drivers data with Morocco locations
     const drivers = [
-      { id: 1, name: 'Youssef Alami', vehicle: 'Truck 01', plate: '12345-A-1', lat: 33.5731, lng: -7.5898, status: 'delivering', speed: '62 km/h', destination: 'Casablanca - Client A', eta: '14:30', order: 'ORD-001', color: '#3b82f6' },
-      { id: 2, name: 'Karim Benali', vehicle: 'Truck 02', plate: '67890-B-2', lat: 34.0209, lng: -6.8416, status: 'delivering', speed: '75 km/h', destination: 'Rabat - Client B', eta: '15:00', order: 'ORD-002', color: '#10b981' },
-      { id: 3, name: 'Hassan Tazi', vehicle: 'Truck 03', plate: '11223-C-3', lat: 31.6295, lng: -7.9811, status: 'delayed', speed: '0 km/h', destination: 'Marrakech - Client C', eta: '16:45', order: 'ORD-003', color: '#ef4444' },
-      { id: 4, name: 'Omar Idrissi', vehicle: 'Truck 04', plate: '44556-D-4', lat: 35.7595, lng: -5.8340, status: 'delivering', speed: '58 km/h', destination: 'Tanger - Client D', eta: '17:15', order: 'ORD-004', color: '#f59e0b' },
+      { id: 1, name: 'Youssef Alami', vehicle: 'Truck 01', plate: '12345-A-1', container: 'CONT-2024-001', lat: 33.5731, lng: -7.5898, status: 'delivering', speed: '62 km/h', destination: 'Casablanca - Client A', eta: 45, order: 'ORD-001', color: '#3b82f6', fuel: 72 },
+      { id: 2, name: 'Karim Benali', vehicle: 'Truck 02', plate: '67890-B-2', container: 'CONT-2024-002', lat: 34.0209, lng: -6.8416, status: 'delivering', speed: '75 km/h', destination: 'Rabat - Client B', eta: 28, order: 'ORD-002', color: '#10b981', fuel: 45 },
+      { id: 3, name: 'Hassan Tazi', vehicle: 'Truck 03', plate: '11223-C-3', container: 'CONT-2024-003', lat: 31.6295, lng: -7.9811, status: 'delayed', speed: '0 km/h', destination: 'Marrakech - Client C', eta: 95, order: 'ORD-003', color: '#ef4444', fuel: 18 },
+      { id: 4, name: 'Omar Idrissi', vehicle: 'Truck 04', plate: '44556-D-4', container: 'CONT-2024-004', lat: 35.7595, lng: -5.8340, status: 'delivering', speed: '58 km/h', destination: 'Tanger - Client D', eta: 62, order: 'ORD-004', color: '#f59e0b', fuel: 88 },
     ];
 
-    const deliveries = [
-      { id: 'ORD-001', driver: 'Youssef Alami', destination: 'Casablanca - Client A', eta: '14:30', status: 'delivering' },
-      { id: 'ORD-002', driver: 'Karim Benali', destination: 'Rabat - Client B', eta: '15:00', status: 'delivering' },
-      { id: 'ORD-003', driver: 'Hassan Tazi', destination: 'Marrakech - Client C', eta: '16:45', status: 'delayed' },
-      { id: 'ORD-004', driver: 'Omar Idrissi', destination: 'Tanger - Client D', eta: '17:15', status: 'delivering' },
-      { id: 'ORD-005', driver: 'Youssef Alami', destination: 'Agadir - Client E', eta: '18:00', status: 'completed' },
-      { id: 'ORD-006', driver: 'Karim Benali', destination: 'Fes - Client F', eta: '13:00', status: 'completed' },
-    ];
-
-    // Init map centered on Morocco
+    // Init map
     const map = L.map('map').setView([32.0, -6.0], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Add warehouse marker
+    // Warehouse marker
     const warehouseIcon = L.divIcon({
       html: `<div style="background:#0f172a;border:2px solid #3b82f6;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
@@ -131,15 +137,13 @@
           <polyline points="9 22 9 12 15 12 15 22"/>
         </svg>
       </div>`,
-      className: '',
-      iconSize: [32, 32],
-      iconAnchor: [16, 16]
+      className: '', iconSize: [32, 32], iconAnchor: [16, 16]
     });
     L.marker([33.5731, -7.5898], { icon: warehouseIcon })
       .addTo(map)
       .bindPopup('<b>Ascent Main Warehouse</b><br>Casablanca, Morocco');
 
-    // Add driver markers
+    // Truck markers
     const markers = {};
     drivers.forEach(driver => {
       const icon = L.divIcon({
@@ -150,26 +154,35 @@
             <circle cx="18.5" cy="18.5" r="2.5" fill="white"/>
           </svg>
         </div>`,
-        className: '',
-        iconSize: [36, 36],
-        iconAnchor: [18, 18]
+        className: '', iconSize: [36, 36], iconAnchor: [18, 18]
       });
-
-      const marker = L.marker([driver.lat, driver.lng], { icon })
+      markers[driver.id] = L.marker([driver.lat, driver.lng], { icon })
         .addTo(map)
         .bindPopup(`
-          <div style="font-family:sans-serif;min-width:180px;">
-            <p style="font-weight:600;margin:0 0 4px">${driver.name}</p>
-            <p style="color:#64748b;font-size:12px;margin:0 0 2px">${driver.vehicle} · ${driver.plate}</p>
-            <p style="color:#64748b;font-size:12px;margin:0 0 2px">Speed: ${driver.speed}</p>
-            <p style="color:#64748b;font-size:12px;margin:0 0 2px">→ ${driver.destination}</p>
-            <p style="color:#64748b;font-size:12px;margin:0">ETA: ${driver.eta}</p>
+          <div style="font-family:sans-serif;min-width:200px;">
+            <p style="font-weight:600;margin:0 0 6px">${driver.name}</p>
+            <p style="color:#64748b;font-size:12px;margin:0 0 2px">🚛 ${driver.vehicle} · ${driver.plate}</p>
+            <p style="color:#64748b;font-size:12px;margin:0 0 2px">📦 Container: ${driver.container}</p>
+            <p style="color:#64748b;font-size:12px;margin:0 0 2px">⚡ Speed: ${driver.speed}</p>
+            <p style="color:#64748b;font-size:12px;margin:0 0 2px">📍 → ${driver.destination}</p>
+            <p style="color:#64748b;font-size:12px;margin:0 0 2px">⏱ ETA: ${driver.eta} min</p>
+            <p style="color:#64748b;font-size:12px;margin:0">⛽ Fuel: ${driver.fuel}%</p>
           </div>
         `);
-      markers[driver.id] = marker;
     });
 
-    // Render driver list
+    function getFuelBar(fuel) {
+      const color = fuel > 50 ? '#22c55e' : fuel > 20 ? '#f59e0b' : '#ef4444';
+      return `
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;background:#e2e8f0;border-radius:99px;height:6px;">
+            <div style="width:${fuel}%;background:${color};border-radius:99px;height:6px;transition:width 0.3s;"></div>
+          </div>
+          <span style="font-size:11px;color:${color};font-weight:500;">${fuel}%</span>
+        </div>
+      `;
+    }
+
     function renderDriverList() {
       const statusColors = {
         delivering: 'bg-green-100 text-green-700',
@@ -183,56 +196,154 @@
             <p class="text-sm font-medium text-slate-700">${d.name}</p>
             <span class="text-xs px-2 py-0.5 rounded-full ${statusColors[d.status]} capitalize">${d.status}</span>
           </div>
-          <p class="text-xs text-slate-400 mb-1"><i class="ti ti-truck mr-1"></i>${d.vehicle} · ${d.plate}</p>
+          <p class="text-xs text-slate-500 mb-1"><i class="ti ti-truck mr-1"></i>${d.plate}</p>
+          <p class="text-xs text-slate-500 mb-1"><i class="ti ti-box mr-1"></i>${d.container}</p>
           <p class="text-xs text-slate-400 mb-1"><i class="ti ti-map-pin mr-1"></i>${d.destination}</p>
-          <div class="flex items-center justify-between mt-2">
-            <p class="text-xs text-slate-400"><i class="ti ti-clock mr-1"></i>ETA: ${d.eta}</p>
-            <p class="text-xs font-medium text-blue-500">${d.speed}</p>
+          <p class="text-xs text-slate-400 mb-2"><i class="ti ti-clock mr-1"></i>ETA: ${d.eta} min · ${d.speed}</p>
+          <div class="mt-1">
+            <p class="text-xs text-slate-400 mb-1"><i class="ti ti-gas-station mr-1"></i>Fuel level</p>
+            ${getFuelBar(d.fuel)}
           </div>
+          ${d.eta <= 30 ? `
+            <div class="mt-2 bg-yellow-50 border border-yellow-200 rounded-lg px-2 py-1.5 text-xs text-yellow-700 flex items-center gap-1">
+              <i class="ti ti-bell"></i> Arriving in ${d.eta} min
+            </div>
+          ` : ''}
         </div>
       `).join('');
     }
 
-    // Render deliveries table
     function renderDeliveries() {
       const statusBadge = {
         delivering: '<span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">Delivering</span>',
         delayed: '<span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">Delayed</span>',
         completed: '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">Completed</span>',
       };
-      document.getElementById('deliveriesTable').innerHTML = deliveries.map(d => `
-        <tr class="border-b border-slate-100 hover:bg-slate-50">
-          <td class="px-4 py-3 text-slate-500">${d.id}</td>
-          <td class="px-4 py-3 text-slate-700 font-medium">${d.driver}</td>
+      document.getElementById('deliveriesTable').innerHTML = drivers.map(d => `
+        <tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="openTruckModal(${d.id})">
+          <td class="px-4 py-3 text-slate-500">${d.order}</td>
+          <td class="px-4 py-3 text-slate-700 font-medium">${d.name}</td>
+          <td class="px-4 py-3 text-slate-600 font-mono text-xs">${d.plate}</td>
+          <td class="px-4 py-3 text-slate-600 font-mono text-xs">${d.container}</td>
           <td class="px-4 py-3 text-slate-600">${d.destination}</td>
-          <td class="px-4 py-3 text-slate-600">${d.eta}</td>
-          <td class="px-4 py-3">${statusBadge[d.status]}</td>
+          <td class="px-4 py-3 text-slate-600">${d.eta} min</td>
+          <td class="px-4 py-3" style="min-width:100px;">${getFuelBar(d.fuel)}</td>
+          <td class="px-4 py-3">${statusBadge[d.status] || ''}</td>
         </tr>
       `).join('');
+    }
+
+    function renderArrivalAlerts() {
+      const arriving = drivers.filter(d => d.eta <= 30 && d.status === 'delivering');
+      const lowFuel = drivers.filter(d => d.fuel <= 20);
+
+      let html = '';
+      arriving.forEach(d => {
+        html += `
+          <div class="flex items-center gap-3 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg text-sm">
+            <i class="ti ti-bell-ringing text-lg flex-shrink-0"></i>
+            <p><strong>${d.name}</strong> (${d.plate} · ${d.container}) is arriving at <strong>${d.destination}</strong> in <strong>${d.eta} minutes</strong> — prepare the dock!</p>
+          </div>
+        `;
+      });
+      lowFuel.forEach(d => {
+        html += `
+          <div class="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <i class="ti ti-gas-station text-lg flex-shrink-0"></i>
+            <p><strong>${d.name}</strong> (${d.plate}) has low fuel — <strong>${d.fuel}%</strong> remaining. Please contact the driver.</p>
+          </div>
+        `;
+      });
+      document.getElementById('arrivalAlerts').innerHTML = html;
+    }
+
+    function openTruckModal(id) {
+      const d = drivers.find(x => x.id === id);
+      if (!d) return;
+      document.getElementById('modalTitle').textContent = d.vehicle + ' — ' + d.name;
+      document.getElementById('modalContent').innerHTML = `
+        <div class="flex flex-col gap-3">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-xs text-slate-400 mb-1">Plate number</p>
+              <p class="text-sm font-mono font-medium text-slate-700">${d.plate}</p>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-xs text-slate-400 mb-1">Container</p>
+              <p class="text-sm font-mono font-medium text-slate-700">${d.container}</p>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-xs text-slate-400 mb-1">Speed</p>
+              <p class="text-sm font-medium text-slate-700">${d.speed}</p>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-xs text-slate-400 mb-1">ETA</p>
+              <p class="text-sm font-medium text-slate-700">${d.eta} minutes</p>
+            </div>
+          </div>
+          <div class="bg-slate-50 rounded-lg p-3">
+            <p class="text-xs text-slate-400 mb-1">Destination</p>
+            <p class="text-sm font-medium text-slate-700">${d.destination}</p>
+          </div>
+          <div class="bg-slate-50 rounded-lg p-3">
+            <p class="text-xs text-slate-400 mb-2">Fuel level</p>
+            ${getFuelBar(d.fuel)}
+          </div>
+          <div class="bg-slate-50 rounded-lg p-3">
+            <p class="text-xs text-slate-400 mb-1">GPS coordinates</p>
+            <p class="text-sm font-mono text-slate-700">${d.lat.toFixed(4)}, ${d.lng.toFixed(4)}</p>
+          </div>
+          <div class="bg-slate-50 rounded-lg p-3">
+            <p class="text-xs text-slate-400 mb-1">Order</p>
+            <p class="text-sm font-medium text-slate-700">${d.order}</p>
+          </div>
+          ${d.eta <= 30 ? `
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-700 flex items-center gap-2">
+              <i class="ti ti-bell-ringing"></i>
+              Arriving soon — dock preparation required!
+            </div>
+          ` : ''}
+          ${d.fuel <= 20 ? `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 flex items-center gap-2">
+              <i class="ti ti-gas-station"></i>
+              Low fuel warning — contact driver immediately!
+            </div>
+          ` : ''}
+        </div>
+      `;
+      document.getElementById('truckModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('truckModal').style.display = 'none';
     }
 
     function focusDriver(id) {
       const driver = drivers.find(d => d.id === id);
       if (!driver) return;
       map.setView([driver.lat, driver.lng], 10);
-      markers[id].openPopup();
+      markers[driver.id].openPopup();
     }
 
-    // Simulate live movement
+    // Simulate live movement and ETA countdown
     function simulateMovement() {
       drivers.forEach(driver => {
         if (driver.status === 'delivering') {
           driver.lat += (Math.random() - 0.5) * 0.01;
           driver.lng += (Math.random() - 0.5) * 0.01;
+          if (driver.eta > 1) driver.eta -= 1;
           markers[driver.id].setLatLng([driver.lat, driver.lng]);
         }
       });
+      renderDriverList();
+      renderDeliveries();
+      renderArrivalAlerts();
     }
 
     renderDriverList();
     renderDeliveries();
-    setInterval(simulateMovement, 3000);
+    renderArrivalAlerts();
+    setInterval(simulateMovement, 5000);
   </script>
-
 </body>
 </html>
