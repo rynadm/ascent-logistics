@@ -22,7 +22,8 @@
   </nav>
 
   <!-- HERO -->
-  <div id="heroSection" class="flex flex-col items-center justify-center px-6 py-16 text-center">
+  <!-- HERO -->
+  <div id="heroSection" class="flex flex-col items-center justify-center px-6 py-16 text-center" style="display:flex !important;">
     <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-6">
       <i class="ti ti-truck-delivery text-blue-400 text-4xl"></i>
     </div>
@@ -874,6 +875,9 @@ if (savedCustomer) {
 }
 // Note: we no longer auto-redirect workers so the portal always shows
   </script>
-
-</body>
-</html>
+// ─── SESSION CHECK ────────────────────────────────────────
+    const savedCustomer = localStorage.getItem('customer_session');
+    if (savedCustomer) {
+      currentCustomer = JSON.parse(savedCustomer);
+      showCustomerSection();
+    }
