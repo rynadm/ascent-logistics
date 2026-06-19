@@ -93,7 +93,6 @@
           <h2 class="text-sm font-medium text-slate-700 mb-2">Role Permissions</h2>
           <p class="text-xs text-slate-400 mb-6">Control which pages and actions each role can access. Changes apply immediately to all users with that role.</p>
 
-          <!-- PERMISSION MATRIX -->
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
@@ -134,7 +133,7 @@
               <div class="w-5 h-5 rounded bg-slate-200 flex items-center justify-center"><i class="ti ti-lock text-slate-500 text-xs"></i></div>
               Locked (admin only)
             </div>
-            <button onclick="savePermissions()" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-2">
+            <button onclick="saveRolePermissions()" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-2">
               <i class="ti ti-device-floppy"></i> Save permissions
             </button>
           </div>
@@ -213,8 +212,8 @@
       loadUsers();
     }
 
-    // Default permissions stored in localStorage
-    const defaultPermissions = {
+    // ─── PERMISSIONS ──────────────────────────────────────────
+    const defaultRolePermissions = {
       'Dashboard':      { admin: 'full', manager: 'view', operator: 'view', driver: 'none' },
       'Inventory':      { admin: 'full', manager: 'view', operator: 'none', driver: 'none' },
       'Receiving':      { admin: 'full', manager: 'view', operator: 'full', driver: 'none' },
@@ -229,7 +228,7 @@
       'Settings':       { admin: 'locked', manager: 'locked', operator: 'locked', driver: 'locked' },
     };
 
-    let permissions = JSON.parse(localStorage.getItem('ascent_permissions') || JSON.stringify(defaultPermissions));
+    var rolePermissions = JSON.parse(localStorage.getItem('ascent_permissions') || JSON.stringify(defaultRolePermissions));
 
     function showUsersTab(tab) {
       document.getElementById('users-tab').classList.toggle('hidden', tab !== 'users');
@@ -239,11 +238,10 @@
       if (tab === 'permissions') renderPermissions();
     }
 
-    // ─── PERMISSIONS ──────────────────────────────────────────
     function renderPermissions() {
       const roles = ['admin', 'manager', 'operator', 'driver'];
       const tbody = document.getElementById('permissionsTable');
-      tbody.innerHTML = Object.entries(permissions).map(([page, perms]) => `
+      tbody.innerHTML = Object.entries(rolePermissions).map(([page, perms]) => `
         <tr class="border-b border-slate-100 hover:bg-slate-50">
           <td class="py-3 px-4 text-sm font-medium text-slate-700">
             <div class="flex items-center gap-2">
@@ -257,7 +255,7 @@
                 ? `<div class="w-7 h-7 rounded bg-slate-100 flex items-center justify-center mx-auto" title="Locked">
                     <i class="ti ti-lock text-slate-400 text-xs"></i>
                    </div>`
-                : `<select onchange="updatePermission('${page}','${role}',this.value)"
+                : `<select onchange="updateRolePermission('${page}','${role}',this.value)"
                     class="text-xs border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:border-blue-400 bg-white">
                     <option value="full" ${perms[role] === 'full' ? 'selected' : ''}>✅ Full</option>
                     <option value="view" ${perms[role] === 'view' ? 'selected' : ''}>👁 View only</option>
@@ -288,14 +286,13 @@
       return icons[page] || 'ti-circle';
     }
 
-    function updatePermission(page, role, value) {
-      permissions[page][role] = value;
+    function updateRolePermission(page, role, value) {
+      rolePermissions[page][role] = value;
     }
 
-    function savePermissions() {
-      localStorage.setItem('ascent_permissions', JSON.stringify(permissions));
+    function saveRolePermissions() {
+      localStorage.setItem('ascent_permissions', JSON.stringify(rolePermissions));
 
-      // Update auth.js permissions dynamically
       const pageMap = {
         'Dashboard':      'index.html',
         'Inventory':      'inventory.html',
@@ -311,9 +308,8 @@
         'Settings':       'settings.html',
       };
 
-      // Build new permissions object
       const newPerms = {};
-      Object.entries(permissions).forEach(([page, perms]) => {
+      Object.entries(rolePermissions).forEach(([page, perms]) => {
         const file = pageMap[page];
         if (!file) return;
         const roles = [];
