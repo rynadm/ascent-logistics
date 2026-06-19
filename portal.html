@@ -39,28 +39,35 @@
   </nav>
 
   <!-- HERO -->
-  <!-- HERO -->
- <h1 class="text-4xl font-bold text-white mb-3" id="hero-title">Welcome to Ascent Logistics</h1>
+  <div id="heroSection" class="flex flex-col items-center justify-center min-h-screen px-6 text-center">
+    <h1 class="text-4xl font-bold text-white mb-3" id="hero-title">Welcome to Ascent Logistics</h1>
     <p class="text-slate-400 text-lg mb-12 max-w-xl" id="hero-sub">Your complete logistics platform — warehouse management, real-time tracking, and seamless delivery.</p>
 
     <!-- CHOICE CARDS -->
     <div class="grid grid-cols-2 gap-6 max-w-2xl w-full">
 
       <!-- WORKER CARD -->
-      <h2 class="text-white text-xl font-semibold mb-2" id="worker-title">Worker</h2>
+      <div onclick="showWorkerLogin()" class="bg-slate-800 border border-slate-700 rounded-2xl p-8 cursor-pointer hover:border-blue-500 transition-all text-left">
+        <i class="ti ti-id-badge text-blue-400 text-3xl mb-4 block"></i>
+        <h2 class="text-white text-xl font-semibold mb-2" id="worker-title">Worker</h2>
         <p class="text-slate-400 text-sm leading-relaxed" id="worker-desc">Access the warehouse management system, track shipments, manage inventory, and use AI tools.</p>
         <div class="flex items-center gap-2 mt-4 text-blue-400 text-sm font-medium" id="worker-btn">
           Sign in to dashboard →
         </div>
+      </div>
 
       <!-- CUSTOMER CARD -->
-      <h2 class="text-white text-xl font-semibold mb-2" id="customer-title">Customer</h2>
+      <div onclick="showCustomerSection()" class="bg-slate-800 border border-slate-700 rounded-2xl p-8 cursor-pointer hover:border-green-500 transition-all text-left">
+        <i class="ti ti-user text-green-400 text-3xl mb-4 block"></i>
+        <h2 class="text-white text-xl font-semibold mb-2" id="customer-title">Customer</h2>
         <p class="text-slate-400 text-sm leading-relaxed" id="customer-desc">Browse products, place orders, track your deliveries in real time, and get 24/7 support.</p>
         <div class="flex items-center gap-2 mt-4 text-green-400 text-sm font-medium" id="customer-btn">
           Shop & track orders →
         </div>
       </div>
+
     </div>
+  </div>
 
     
 
