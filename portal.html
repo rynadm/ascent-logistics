@@ -15,49 +15,49 @@
       <i class="ti ti-truck-delivery text-blue-400 text-2xl"></i>
       Ascent Logistics and Transport
     </div>
-    <div class="flex items-center gap-2 text-slate-400 text-sm">
-      <i class="ti ti-map-pin text-blue-400"></i>
-      Casablanca, Morocco
+    <div class="flex items-center gap-4">
+      <!-- LANGUAGE SWITCHER -->
+      <div class="flex items-center gap-1 bg-slate-800 border border-slate-700 rounded-xl p-1">
+        <button onclick="setLang('en')" id="lang-en"
+          class="px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white transition-all">
+          🇬🇧 EN
+        </button>
+        <button onclick="setLang('fr')" id="lang-fr"
+          class="px-3 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:bg-slate-700 transition-all">
+          🇫🇷 FR
+        </button>
+        <button onclick="setLang('ar')" id="lang-ar"
+          class="px-3 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:bg-slate-700 transition-all">
+          🇲🇦 AR
+        </button>
+      </div>
+      <div class="flex items-center gap-2 text-slate-400 text-sm">
+        <i class="ti ti-map-pin text-blue-400"></i>
+        Casablanca, Morocco
+      </div>
     </div>
   </nav>
 
   <!-- HERO -->
   <!-- HERO -->
-  <div id="heroSection" class="flex flex-col items-center justify-center px-6 py-16 text-center" style="display:flex !important;">
-    <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-6">
-      <i class="ti ti-truck-delivery text-blue-400 text-4xl"></i>
-    </div>
-    <h1 class="text-4xl font-bold text-white mb-3">Welcome to Ascent Logistics</h1>
-    <p class="text-slate-400 text-lg mb-12 max-w-xl">Your complete logistics platform — warehouse management, real-time tracking, and seamless delivery.</p>
+ <h1 class="text-4xl font-bold text-white mb-3" id="hero-title">Welcome to Ascent Logistics</h1>
+    <p class="text-slate-400 text-lg mb-12 max-w-xl" id="hero-sub">Your complete logistics platform — warehouse management, real-time tracking, and seamless delivery.</p>
 
     <!-- CHOICE CARDS -->
     <div class="grid grid-cols-2 gap-6 max-w-2xl w-full">
 
       <!-- WORKER CARD -->
-      <div onclick="showWorkerLogin()"
-        class="bg-slate-800 border border-slate-700 hover:border-blue-500 rounded-2xl p-8 cursor-pointer transition-all hover:shadow-xl hover:shadow-blue-900/20 group">
-        <div class="w-14 h-14 rounded-xl bg-blue-600 bg-opacity-20 flex items-center justify-center mb-4 group-hover:bg-opacity-30 transition-all">
-          <i class="ti ti-id-badge text-blue-400 text-3xl"></i>
+      <h2 class="text-white text-xl font-semibold mb-2" id="worker-title">Worker</h2>
+        <p class="text-slate-400 text-sm leading-relaxed" id="worker-desc">Access the warehouse management system, track shipments, manage inventory, and use AI tools.</p>
+        <div class="flex items-center gap-2 mt-4 text-blue-400 text-sm font-medium" id="worker-btn">
+          Sign in to dashboard →
         </div>
-        <h2 class="text-white text-xl font-semibold mb-2">I'm a Worker</h2>
-        <p class="text-slate-400 text-sm leading-relaxed">Access the warehouse management system, track shipments, manage inventory, and use AI tools.</p>
-        <div class="flex items-center gap-2 mt-4 text-blue-400 text-sm font-medium">
-          <span>Sign in to dashboard</span>
-          <i class="ti ti-arrow-right"></i>
-        </div>
-      </div>
 
       <!-- CUSTOMER CARD -->
-      <div onclick="showCustomerSection()"
-        class="bg-slate-800 border border-slate-700 hover:border-green-500 rounded-2xl p-8 cursor-pointer transition-all hover:shadow-xl hover:shadow-green-900/20 group">
-        <div class="w-14 h-14 rounded-xl bg-green-600 bg-opacity-20 flex items-center justify-center mb-4 group-hover:bg-opacity-30 transition-all">
-          <i class="ti ti-user text-green-400 text-3xl"></i>
-        </div>
-        <h2 class="text-white text-xl font-semibold mb-2">I'm a Customer</h2>
-        <p class="text-slate-400 text-sm leading-relaxed">Browse products, place orders, track your deliveries in real time, and get 24/7 support.</p>
-        <div class="flex items-center gap-2 mt-4 text-green-400 text-sm font-medium">
-          <span>Shop & track orders</span>
-          <i class="ti ti-arrow-right"></i>
+      <h2 class="text-white text-xl font-semibold mb-2" id="customer-title">Customer</h2>
+        <p class="text-slate-400 text-sm leading-relaxed" id="customer-desc">Browse products, place orders, track your deliveries in real time, and get 24/7 support.</p>
+        <div class="flex items-center gap-2 mt-4 text-green-400 text-sm font-medium" id="customer-btn">
+          Shop & track orders →
         </div>
       </div>
     </div>
@@ -66,8 +66,9 @@
 
   <!-- WORKER LOGIN SECTION -->
   <div id="workerSection" class="hidden max-w-md mx-auto px-6 pb-12">
-    <button onclick="goBack()" class="flex items-center gap-2 text-slate-400 hover:text-slate-200 text-sm mb-6">
-      <i class="ti ti-arrow-left"></i> Back
+   <button onclick="goBack()" id="back-btn-worker" class="flex items-center gap-2 text-slate-400 hover:text-slate-200 text-sm mb-6">
+      ← Back
+    </button>
     </button>
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8">
       <div class="flex items-center gap-3 mb-6">
@@ -75,14 +76,14 @@
           <i class="ti ti-id-badge text-blue-400 text-xl"></i>
         </div>
         <div>
-          <h2 class="text-white font-semibold">Worker Portal</h2>
-          <p class="text-slate-400 text-xs">Sign in with your work account</p>
+          <h2 class="text-white font-semibold" id="worker-portal-title">Worker Portal</h2>
+        <p class="text-slate-400 text-xs" id="worker-portal-sub">Sign in with your work account</p>
         </div>
       </div>
       <div id="workerError" class="hidden bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 text-red-400 text-sm px-4 py-3 rounded-lg mb-4"></div>
       <div class="flex flex-col gap-4">
         <div>
-          <label class="text-xs text-slate-400 mb-1.5 block">Email</label>
+          <label class="text-xs text-slate-400 mb-1.5 block" id="worker-email-label">Email</label>
           <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-blue-400">
             <i class="ti ti-mail text-slate-500"></i>
             <input id="workerEmail" type="email" placeholder="your@ascent.com"
@@ -91,7 +92,7 @@
           </div>
         </div>
         <div>
-          <label class="text-xs text-slate-400 mb-1.5 block">Password</label>
+          <label class="text-xs text-slate-400 mb-1.5 block" id="worker-password-label">Password</label>
           <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-blue-400">
             <i class="ti ti-lock text-slate-500"></i>
             <input id="workerPassword" type="password" placeholder="••••••••"
@@ -105,15 +106,16 @@
         </button>
       </div>
       <div class="mt-4 bg-slate-900 rounded-lg px-4 py-3">
-        <p class="text-xs text-slate-500">Don't have an account? Contact your administrator to create one.</p>
+        <p class="text-xs text-slate-500" id="worker-contact-admin">Don't have an account? Contact your administrator to create one.</p>
       </div>
     </div>
   </div>
 
   <!-- CUSTOMER SECTION -->
   <div id="customerSection" class="hidden max-w-6xl mx-auto px-6 pb-12">
-    <button onclick="goBack()" class="flex items-center gap-2 text-slate-400 hover:text-slate-200 text-sm mb-6">
-      <i class="ti ti-arrow-left"></i> Back
+    <button onclick="goBack()" id="back-btn-customer" class="flex items-center gap-2 text-slate-400 hover:text-slate-200 text-sm mb-6">
+      ← Back
+    </button>
     </button>
 
     <!-- CUSTOMER AUTH -->
@@ -122,8 +124,8 @@
 
         <!-- LOGIN -->
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-          <h2 class="text-white font-semibold mb-1">Sign in</h2>
-          <p class="text-slate-400 text-xs mb-5">Access your account</p>
+          <h2 class="text-white font-semibold mb-1" id="cust-signin-title">Sign in</h2>
+          <p class="text-slate-400 text-xs mb-5" id="cust-signin-sub">Access your account</p>
           <div id="customerLoginError" class="hidden bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 text-red-400 text-xs px-3 py-2 rounded-lg mb-3"></div>
           <div class="flex flex-col gap-3">
             <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-green-400">
@@ -147,7 +149,7 @@
 
         <!-- REGISTER -->
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-          <h2 class="text-white font-semibold mb-1">Create account</h2>
+          <h2 class="text-white font-semibold mb-1" id="cust-register-title">Create account</h2>
           <p class="text-slate-400 text-xs mb-5">Join Ascent Logistics</p>
           <div id="customerRegError" class="hidden bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 text-red-400 text-xs px-3 py-2 rounded-lg mb-3"></div>
           <div id="customerRegSuccess" class="hidden bg-green-500 bg-opacity-10 border border-green-500 border-opacity-30 text-green-400 text-xs px-3 py-2 rounded-lg mb-3"></div>
@@ -281,7 +283,7 @@
                   <i class="ti ti-headset text-green-400 text-xs"></i>
                 </div>
                 <div class="bg-slate-700 rounded-xl rounded-tl-none px-3 py-2.5 max-w-sm">
-                  <p class="text-sm text-slate-200">Hello! Welcome to Ascent Logistics support. How can I help you today? 😊</p>
+                  <p class="text-sm text-slate-200" id="support-welcome-msg">Hello! Welcome to Ascent Logistics support. How can I help you today? 😊</p>
                   <p class="text-xs text-slate-400 mt-1">Just now</p>
                 </div>
               </div>
@@ -367,6 +369,273 @@
   </div>
 
   <script>
+    // ─── TRANSLATIONS ─────────────────────────────────────────
+    const translations = {
+      en: {
+        welcome_title: 'Welcome to Ascent Logistics',
+        welcome_sub: 'Your complete logistics platform — warehouse management, real-time tracking, and seamless delivery.',
+        worker_title: "I'm a Worker",
+        worker_desc: 'Access the warehouse management system, track shipments, manage inventory, and use AI tools.',
+        worker_btn: 'Sign in to dashboard →',
+        customer_title: "I'm a Customer",
+        customer_desc: 'Browse products, place orders, track your deliveries in real time, and get 24/7 support.',
+        customer_btn: 'Shop & track orders →',
+        back: '← Back',
+        worker_portal: 'Worker Portal',
+        worker_portal_sub: 'Sign in with your work account',
+        email: 'Email',
+        password: 'Password',
+        signin: 'Sign in to dashboard',
+        signin_customer: 'Sign in',
+        create_account: 'Create account',
+        full_name: 'Full name',
+        company: 'Company (optional)',
+        phone: 'Phone',
+        password_min: 'Password (min 6 chars)',
+        already_account: 'Already have an account?',
+        no_account: "Don't have an account?",
+        products_tab: 'Products',
+        orders_tab: 'My Orders',
+        tracking_tab: 'Track Order',
+        support_tab: 'Support 24/7',
+        available_products: 'Available Products',
+        search: 'Search...',
+        order_now: '🛒 Order now',
+        unavailable: 'Unavailable',
+        delivery: 'Delivery',
+        in_stock: 'in stock',
+        out_of_stock: 'Out of stock',
+        place_order: 'Place Order',
+        delivery_address: 'Delivery address',
+        quantity: 'Quantity',
+        notes: 'Notes (optional)',
+        confirm_order: '✅ Confirm Order',
+        my_orders: 'My Orders',
+        track_order: 'Track Your Order',
+        track_placeholder: 'Enter order ID',
+        track_btn: 'Track',
+        support_online: 'Online — Available 24/7',
+        support_welcome: 'Hello! Welcome to Ascent Logistics support. How can I help you today? 😊',
+        type_message: 'Type your message...',
+        quick_questions: 'Quick questions',
+        q1: '📦 Where is my order?',
+        q2: '🕐 What are your delivery times?',
+        q3: '❌ How do I cancel an order?',
+        q4: '🔄 How do I return a product?',
+        q5: '💳 Payment methods?',
+        phone_support: '📞 Phone support',
+        no_orders: 'No orders yet',
+        browse_products: 'Browse products',
+        track_this: 'Track this order',
+        total: 'Total',
+        support_24: 'Support available 24/7',
+        hello: 'Hello',
+        customer_account: 'Customer account',
+        logout: 'Logout',
+        order_placed: 'Order placed successfully!',
+        contact_admin: "Don't have an account? Contact your administrator.",
+        dir: 'ltr'
+      },
+      fr: {
+        welcome_title: 'Bienvenue chez Ascent Logistics',
+        welcome_sub: 'Votre plateforme logistique complète — gestion d\'entrepôt, suivi en temps réel et livraison fluide.',
+        worker_title: 'Je suis un Employé',
+        worker_desc: 'Accédez au système de gestion d\'entrepôt, suivez les expéditions et gérez les stocks.',
+        worker_btn: 'Se connecter au tableau de bord →',
+        customer_title: 'Je suis un Client',
+        customer_desc: 'Parcourez les produits, passez des commandes, suivez vos livraisons en temps réel et obtenez une assistance 24/7.',
+        customer_btn: 'Commander & suivre →',
+        back: '← Retour',
+        worker_portal: 'Espace Employé',
+        worker_portal_sub: 'Connectez-vous avec votre compte professionnel',
+        email: 'Email',
+        password: 'Mot de passe',
+        signin: 'Se connecter au tableau de bord',
+        signin_customer: 'Se connecter',
+        create_account: 'Créer un compte',
+        full_name: 'Nom complet',
+        company: 'Entreprise (optionnel)',
+        phone: 'Téléphone',
+        password_min: 'Mot de passe (min 6 caractères)',
+        already_account: 'Vous avez déjà un compte?',
+        no_account: 'Pas encore de compte?',
+        products_tab: 'Produits',
+        orders_tab: 'Mes Commandes',
+        tracking_tab: 'Suivi Commande',
+        support_tab: 'Support 24/7',
+        available_products: 'Produits disponibles',
+        search: 'Rechercher...',
+        order_now: '🛒 Commander',
+        unavailable: 'Indisponible',
+        delivery: 'Livraison',
+        in_stock: 'en stock',
+        out_of_stock: 'Rupture de stock',
+        place_order: 'Passer commande',
+        delivery_address: 'Adresse de livraison',
+        quantity: 'Quantité',
+        notes: 'Notes (optionnel)',
+        confirm_order: '✅ Confirmer la commande',
+        my_orders: 'Mes Commandes',
+        track_order: 'Suivre votre commande',
+        track_placeholder: 'Entrez l\'ID de commande',
+        track_btn: 'Suivre',
+        support_online: 'En ligne — Disponible 24/7',
+        support_welcome: 'Bonjour! Bienvenue chez Ascent Logistics. Comment puis-je vous aider? 😊',
+        type_message: 'Tapez votre message...',
+        quick_questions: 'Questions rapides',
+        q1: '📦 Où est ma commande?',
+        q2: '🕐 Quels sont vos délais de livraison?',
+        q3: '❌ Comment annuler une commande?',
+        q4: '🔄 Comment retourner un produit?',
+        q5: '💳 Moyens de paiement?',
+        phone_support: '📞 Support téléphonique',
+        no_orders: 'Aucune commande',
+        browse_products: 'Parcourir les produits',
+        track_this: 'Suivre cette commande',
+        total: 'Total',
+        support_24: 'Support disponible 24/7',
+        hello: 'Bonjour',
+        customer_account: 'Compte client',
+        logout: 'Déconnexion',
+        order_placed: 'Commande passée avec succès!',
+        contact_admin: "Pas de compte? Contactez votre administrateur.",
+        dir: 'ltr'
+      },
+      ar: {
+        welcome_title: 'مرحباً بكم في Ascent Logistics',
+        welcome_sub: 'منصتكم اللوجستية الشاملة — إدارة المستودعات، التتبع الفوري، والتسليم السلس.',
+        worker_title: 'أنا موظف',
+        worker_desc: 'الوصول إلى نظام إدارة المستودعات، تتبع الشحنات، وإدارة المخزون.',
+        worker_btn: 'تسجيل الدخول إلى لوحة التحكم ←',
+        customer_title: 'أنا عميل',
+        customer_desc: 'تصفح المنتجات، أدر الطلبات، تتبع توصيلاتك في الوقت الفعلي، واحصل على دعم على مدار الساعة.',
+        customer_btn: 'تسوق وتتبع الطلبات ←',
+        back: 'رجوع →',
+        worker_portal: 'بوابة الموظف',
+        worker_portal_sub: 'سجل دخولك بحساب العمل',
+        email: 'البريد الإلكتروني',
+        password: 'كلمة المرور',
+        signin: 'تسجيل الدخول إلى لوحة التحكم',
+        signin_customer: 'تسجيل الدخول',
+        create_account: 'إنشاء حساب',
+        full_name: 'الاسم الكامل',
+        company: 'الشركة (اختياري)',
+        phone: 'الهاتف',
+        password_min: 'كلمة المرور (6 أحرف على الأقل)',
+        already_account: 'لديك حساب بالفعل؟',
+        no_account: 'ليس لديك حساب؟',
+        products_tab: 'المنتجات',
+        orders_tab: 'طلباتي',
+        tracking_tab: 'تتبع الطلب',
+        support_tab: 'الدعم 24/7',
+        available_products: 'المنتجات المتاحة',
+        search: 'بحث...',
+        order_now: '🛒 اطلب الآن',
+        unavailable: 'غير متوفر',
+        delivery: 'التسليم',
+        in_stock: 'في المخزون',
+        out_of_stock: 'نفد المخزون',
+        place_order: 'تقديم طلب',
+        delivery_address: 'عنوان التسليم',
+        quantity: 'الكمية',
+        notes: 'ملاحظات (اختياري)',
+        confirm_order: '✅ تأكيد الطلب',
+        my_orders: 'طلباتي',
+        track_order: 'تتبع طلبك',
+        track_placeholder: 'أدخل رقم الطلب',
+        track_btn: 'تتبع',
+        support_online: 'متصل — متاح 24/7',
+        support_welcome: 'مرحباً! أهلاً بكم في دعم Ascent Logistics. كيف يمكنني مساعدتك؟ 😊',
+        type_message: 'اكتب رسالتك...',
+        quick_questions: 'أسئلة سريعة',
+        q1: '📦 أين طلبي؟',
+        q2: '🕐 ما هي مواعيد التسليم؟',
+        q3: '❌ كيف أتلغي الطلب؟',
+        q4: '🔄 كيف أرجع منتجاً؟',
+        q5: '💳 طرق الدفع؟',
+        phone_support: '📞 دعم هاتفي',
+        no_orders: 'لا توجد طلبات بعد',
+        browse_products: 'تصفح المنتجات',
+        track_this: 'تتبع هذا الطلب',
+        total: 'المجموع',
+        support_24: 'الدعم متاح 24/7',
+        hello: 'مرحباً',
+        customer_account: 'حساب العميل',
+        logout: 'تسجيل الخروج',
+        order_placed: 'تم تقديم الطلب بنجاح!',
+        contact_admin: 'ليس لديك حساب؟ تواصل مع المسؤول.',
+        dir: 'rtl'
+      }
+    };
+
+    let currentLang = localStorage.getItem('ascent_lang') || 'en';
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('ascent_lang', lang);
+      applyTranslations();
+
+      // Update active button
+      ['en','fr','ar'].forEach(l => {
+        const btn = document.getElementById(`lang-${l}`);
+        if (l === lang) {
+          btn.className = 'px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white transition-all';
+        } else {
+          btn.className = 'px-3 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:bg-slate-700 transition-all';
+        }
+      });
+    }
+
+    function t(key) {
+      return translations[currentLang][key] || translations['en'][key] || key;
+    }
+
+    function applyTranslations() {
+      const lang = translations[currentLang];
+
+      // Set page direction for Arabic
+      document.body.dir = lang.dir;
+
+      // Hero
+      document.getElementById('hero-title').textContent = lang.welcome_title;
+      document.getElementById('hero-sub').textContent = lang.welcome_sub;
+      document.getElementById('worker-title').textContent = lang.worker_title;
+      document.getElementById('worker-desc').textContent = lang.worker_desc;
+      document.getElementById('worker-btn').textContent = lang.worker_btn;
+      document.getElementById('customer-title').textContent = lang.customer_title;
+      document.getElementById('customer-desc').textContent = lang.customer_desc;
+      document.getElementById('customer-btn').textContent = lang.customer_btn;
+
+      // Worker section
+      document.getElementById('back-btn-worker').textContent = lang.back;
+      document.getElementById('worker-portal-title').textContent = lang.worker_portal;
+      document.getElementById('worker-portal-sub').textContent = lang.worker_portal_sub;
+      document.getElementById('worker-email-label').textContent = lang.email;
+      document.getElementById('worker-password-label').textContent = lang.password;
+      document.getElementById('workerLoginBtn').innerHTML = `<i class="ti ti-login"></i> ${lang.signin}`;
+      document.getElementById('worker-contact-admin').textContent = lang.contact_admin;
+
+      // Customer auth
+      document.getElementById('back-btn-customer').textContent = lang.back;
+      document.getElementById('cust-signin-title').textContent = lang.signin_customer;
+      document.getElementById('cust-register-title').textContent = lang.create_account;
+      document.getElementById('custLoginBtn').innerHTML = `<i class="ti ti-login"></i> ${lang.signin_customer}`;
+      document.getElementById('custRegBtn').innerHTML = `<i class="ti ti-user-plus"></i> ${lang.create_account}`;
+
+      // Support chat welcome
+      const welcomeMsg = document.getElementById('support-welcome-msg');
+      if (welcomeMsg) welcomeMsg.textContent = lang.support_welcome;
+
+      // Quick questions
+      const quickQuestions = document.querySelectorAll('.quick-question');
+      const questionKeys = ['q1', 'q2', 'q3', 'q4', 'q5'];
+      quickQuestions.forEach((btn, i) => {
+        if (questionKeys[i]) {
+          btn.textContent = lang[questionKeys[i]];
+        }
+      });
+    }
+
     const SUPABASE_URL = 'https://tqqbsxustgqjngqpupnt.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxcWJzeHVzdGdxam5ncXB1cG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MzAwNjAsImV4cCI6MjA5NzMwNjA2MH0.pYYU7Dg_cZ5pYOeX8WsNhW2ZCCffcvpm9iYplQSFWgY';
     const GROQ_API_KEY = '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';
@@ -874,7 +1143,9 @@ if (savedCustomer) {
   showCustomerSection();
 }
 // Note: we no longer auto-redirect workers so the portal always shows
-
+// Apply saved language on load
+    setLang(currentLang);
+    
   </script>
   </body>
 </html>
