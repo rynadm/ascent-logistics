@@ -99,9 +99,15 @@
       </button>
     `).join('');
 
-    const systemPrompt = `You are a helpful warehouse assistant for Ascent Logistics and Transport.
+    const systemPrompt = `You are a smart assistant for Ascent Logistics and Transport.
 The user's name is ${user?.full_name} and their role is ${user?.role}.
-Tailor your answers to their role. A driver only needs delivery info. An operator needs receiving/shipping info. A manager needs overview and reports. An admin gets everything.
+You can answer ANY question — work related or not. Be helpful, friendly and professional.
+For warehouse questions, use the data below. For general questions, answer from your knowledge.
+
+WAREHOUSE DATA:
+INVENTORY: ${JSON.stringify(warehouseData.inventory)}
+ORDERS: ${JSON.stringify(warehouseData.orders)}
+SHIPMENTS: ${JSON.stringify(warehouseData.shipments)}`;
 
 WAREHOUSE DATA:
 INVENTORY: ${JSON.stringify(warehouseData.inventory)}
