@@ -661,15 +661,25 @@
     }
 
     function showCustomerSection() {
-      document.getElementById('heroSection').classList.add('hidden');
-      document.getElementById('workerSection').classList.add('hidden');
-      document.getElementById('customerSection').classList.remove('hidden');
-      const saved = localStorage.getItem('customer_session');
-      if (saved) {
+    const hero = document.getElementById('heroSection');
+    const worker = document.getElementById('workerSection');
+    const customer = document.getElementById('customerSection');
+
+    if (!hero || !worker || !customer) {
+        console.error('Missing section element(s)');
+        return;
+    }
+
+    hero.classList.add('hidden');
+    worker.classList.add('hidden');
+    customer.classList.remove('hidden');
+
+    const saved = localStorage.getItem('customer_session');
+    if (saved) {
         currentCustomer = JSON.parse(saved);
         showCustDashboard();
-      }
     }
+}
 
     function goBack() {
       document.getElementById('heroSection').classList.remove('hidden');
@@ -1145,7 +1155,7 @@ if (savedCustomer) {
 // Note: we no longer auto-redirect workers so the portal always shows
 // Apply saved language on load
     setLang(currentLang);
-    
+
   </script>
   </body>
 </html>
