@@ -36,9 +36,9 @@ function checkAuth() {
   var page = getCurrentPage();
 
   if (!user) {
-    window.location.href = 'login.html';
-    return null;
-  }
+  window.location.href = 'portal.html';
+  return null;
+}
 
   var allowed = permissions[page] || [];
   if (!allowed.includes(user.role)) {

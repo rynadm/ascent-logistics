@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ascent Logistics and Transport</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+</head>
+<body class="bg-slate-900 font-sans min-h-screen">
+
+  <!-- NAV -->
+  <nav class="flex items-center justify-between px-8 py-5">
+    <div class="flex items-center gap-3 text-slate-200 font-semibold text-lg">
+      <i class="ti ti-truck-delivery text-blue-400 text-2xl"></i>
+      Ascent Logistics and Transport
+    </div>
+    <div class="flex items-center gap-2 text-slate-400 text-sm">
+      <i class="ti ti-map-pin text-blue-400"></i>
+      Casablanca, Morocco
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div id="heroSection" class="flex flex-col items-center justify-center px-6 py-16 text-center">
+    <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-6">
+      <i class="ti ti-truck-delivery text-blue-400 text-4xl"></i>
+    </div>
+    <h1 class="text-4xl font-bold text-white mb-3">Welcome to Ascent Logistics</h1>
+    <p class="text-slate-400 text-lg mb-12 max-w-xl">Your complete logistics platform — warehouse management, real-time tracking, and seamless delivery.</p>
+
+    <!-- CHOICE CARDS -->
+    <div class="grid grid-cols-2 gap-6 max-w-2xl w-full">
+
+      <!-- WORKER CARD -->
+      <div onclick="showWorkerLogin()"
+        class="bg-slate-800 border border-slate-700 hover:border-blue-500 rounded-2xl p-8 cursor-pointer transition-all hover:shadow-xl hover:shadow-blue-900/20 group">
+        <div class="w-14 h-14 rounded-xl bg-blue-600 bg-opacity-20 flex items-center justify-center mb-4 group-hover:bg-opacity-30 transition-all">
+          <i class="ti ti-id-badge text-blue-400 text-3xl"></i>
+        </div>
+        <h2 class="text-white text-xl font-semibold mb-2">I'm a Worker</h2>
+        <p class="text-slate-400 text-sm leading-relaxed">Access the warehouse management system, track shipments, manage inventory, and use AI tools.</p>
+        <div class="flex items-center gap-2 mt-4 text-blue-400 text-sm font-medium">
+          <span>Sign in to dashboard</span>
+          <i class="ti ti-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- CUSTOMER CARD -->
+      <div onclick="showCustomerSection()"
+        class="bg-slate-800 border border-slate-700 hover:border-green-500 rounded-2xl p-8 cursor-pointer transition-all hover:shadow-xl hover:shadow-green-900/20 group">
+        <div class="w-14 h-14 rounded-xl bg-green-600 bg-opacity-20 flex items-center justify-center mb-4 group-hover:bg-opacity-30 transition-all">
+          <i class="ti ti-user text-green-400 text-3xl"></i>
+        </div>
+        <h2 class="text-white text-xl font-semibold mb-2">I'm a Customer</h2>
+        <p class="text-slate-400 text-sm leading-relaxed">Browse products, place orders, track your deliveries in real time, and get 24/7 support.</p>
+        <div class="flex items-center gap-2 mt-4 text-green-400 text-sm font-medium">
+          <span>Shop & track orders</span>
+          <i class="ti ti-arrow-right"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="flex items-center gap-12 mt-16 text-center">
+      <div>
+        <p class="text-2xl font-bold text-white">1,284</p>
+        <p class="text-slate-500 text-xs mt-1">Products in stock</p>
+      </div>
+      <div class="w-px h-8 bg-slate-700"></div>
+      <div>
+        <p class="text-2xl font-bold text-white">47</p>
+        <p class="text-slate-500 text-xs mt-1">Orders today</p>
+      </div>
+      <div class="w-px h-8 bg-slate-700"></div>
+      <div>
+        <p class="text-2xl font-bold text-white">4</p>
+        <p class="text-slate-500 text-xs mt-1">Active drivers</p>
+      </div>
+      <div class="w-px h-8 bg-slate-700"></div>
+      <div>
+        <div class="flex items-center gap-1.5 justify-center">
+          <div class="w-2 h-2 rounded-full bg-green-400"></div>
+          <p class="text-2xl font-bold text-white">24/7</p>
+        </div>
+        <p class="text-slate-500 text-xs mt-1">Support available</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORKER LOGIN SECTION -->
+  <div id="workerSection" class="hidden max-w-md mx-auto px-6 pb-12">
+    <button onclick="goBack()" class="flex items-center gap-2 text-slate-400 hover:text-slate-200 text-sm mb-6">
+      <i class="ti ti-arrow-left"></i> Back
+    </button>
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 bg-opacity-20 flex items-center justify-center">
+          <i class="ti ti-id-badge text-blue-400 text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-white font-semibold">Worker Portal</h2>
+          <p class="text-slate-400 text-xs">Sign in with your work account</p>
+        </div>
+      </div>
+      <div id="workerError" class="hidden bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 text-red-400 text-sm px-4 py-3 rounded-lg mb-4"></div>
+      <div class="flex flex-col gap-4">
+        <div>
+          <label class="text-xs text-slate-400 mb-1.5 block">Email</label>
+          <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-blue-400">
+            <i class="ti ti-mail text-slate-500"></i>
+            <input id="workerEmail" type="email" placeholder="your@ascent.com"
+              class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600"
+              onkeydown="if(event.key==='Enter') workerLogin()" />
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 mb-1.5 block">Password</label>
+          <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-blue-400">
+            <i class="ti ti-lock text-slate-500"></i>
+            <input id="workerPassword" type="password" placeholder="••••••••"
+              class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600"
+              onkeydown="if(event.key==='Enter') workerLogin()" />
+          </div>
+        </div>
+        <button onclick="workerLogin()" id="workerLoginBtn"
+          class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-2.5 rounded-lg flex items-center justify-center gap-2 mt-1">
+          <i class="ti ti-login"></i> Sign in to dashboard
+        </button>
+      </div>
+      <div class="mt-4 bg-slate-900 rounded-lg px-4 py-3">
+        <p class="text-xs text-slate-500">Don't have an account? Contact your administrator to create one.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER SECTION -->
+  <div id="customerSection" class="hidden max-w-6xl mx-auto px-6 pb-12">
+    <button onclick="goBack()" class="flex items-center gap-2 text-slate-400 hover:text-slate-200 text-sm mb-6">
+      <i class="ti ti-arrow-left"></i> Back
+    </button>
+
+    <!-- CUSTOMER AUTH -->
+    <div id="customerAuth">
+      <div class="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
+
+        <!-- LOGIN -->
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+          <h2 class="text-white font-semibold mb-1">Sign in</h2>
+          <p class="text-slate-400 text-xs mb-5">Access your account</p>
+          <div id="customerLoginError" class="hidden bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 text-red-400 text-xs px-3 py-2 rounded-lg mb-3"></div>
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-green-400">
+              <i class="ti ti-mail text-slate-500 text-sm"></i>
+              <input id="custLoginEmail" type="email" placeholder="your@email.com"
+                class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600"
+                onkeydown="if(event.key==='Enter') customerLogin()" />
+            </div>
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-green-400">
+              <i class="ti ti-lock text-slate-500 text-sm"></i>
+              <input id="custLoginPassword" type="password" placeholder="••••••••"
+                class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600"
+                onkeydown="if(event.key==='Enter') customerLogin()" />
+            </div>
+            <button onclick="customerLogin()" id="custLoginBtn"
+              class="bg-green-600 hover:bg-green-700 text-white text-sm py-2.5 rounded-lg flex items-center justify-center gap-2">
+              <i class="ti ti-login"></i> Sign in
+            </button>
+          </div>
+        </div>
+
+        <!-- REGISTER -->
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+          <h2 class="text-white font-semibold mb-1">Create account</h2>
+          <p class="text-slate-400 text-xs mb-5">Join Ascent Logistics</p>
+          <div id="customerRegError" class="hidden bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 text-red-400 text-xs px-3 py-2 rounded-lg mb-3"></div>
+          <div id="customerRegSuccess" class="hidden bg-green-500 bg-opacity-10 border border-green-500 border-opacity-30 text-green-400 text-xs px-3 py-2 rounded-lg mb-3"></div>
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-green-400">
+              <i class="ti ti-user text-slate-500 text-sm"></i>
+              <input id="custRegName" type="text" placeholder="Full name"
+                class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600" />
+            </div>
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-green-400">
+              <i class="ti ti-mail text-slate-500 text-sm"></i>
+              <input id="custRegEmail" type="email" placeholder="your@email.com"
+                class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600" />
+            </div>
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-green-400">
+              <i class="ti ti-phone text-slate-500 text-sm"></i>
+              <input id="custRegPhone" type="text" placeholder="+212 6XX XXX XXX"
+                class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600" />
+            </div>
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-green-400">
+              <i class="ti ti-lock text-slate-500 text-sm"></i>
+              <input id="custRegPassword" type="password" placeholder="Password (min 6 chars)"
+                class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600" />
+            </div>
+            <button onclick="customerRegister()" id="custRegBtn"
+              class="bg-green-600 hover:bg-green-700 text-white text-sm py-2.5 rounded-lg flex items-center justify-center gap-2">
+              <i class="ti ti-user-plus"></i> Create account
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMER DASHBOARD -->
+    <div id="customerDashboard" class="hidden">
+
+      <!-- TOP BAR -->
+      <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-xl px-5 py-4 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-green-600 bg-opacity-20 flex items-center justify-center">
+            <i class="ti ti-user text-green-400"></i>
+          </div>
+          <div>
+            <p class="text-slate-200 font-medium text-sm" id="custWelcomeName"></p>
+            <p class="text-slate-500 text-xs">Customer account</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-1.5">
+            <div class="w-2 h-2 rounded-full bg-green-400"></div>
+            <span class="text-slate-400 text-xs">Support 24/7</span>
+          </div>
+          <button onclick="customerLogout()" class="text-slate-500 hover:text-red-400 text-xs flex items-center gap-1">
+            <i class="ti ti-logout"></i> Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="flex gap-1 mb-6 bg-slate-800 border border-slate-700 rounded-xl p-1.5">
+        <button onclick="showCustTab('products')" id="ctab-products"
+          class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-green-600 text-white">
+          <i class="ti ti-box"></i> Products
+        </button>
+        <button onclick="showCustTab('orders')" id="ctab-orders"
+          class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:bg-slate-700">
+          <i class="ti ti-package"></i> My Orders
+        </button>
+        <button onclick="showCustTab('tracking')" id="ctab-tracking"
+          class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:bg-slate-700">
+          <i class="ti ti-map-pin"></i> Track Order
+        </button>
+        <button onclick="showCustTab('support')" id="ctab-support"
+          class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:bg-slate-700">
+          <i class="ti ti-headset"></i> Support 24/7
+        </button>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="ctab-products-content">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-lg font-semibold text-slate-200">Available Products</h2>
+          <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2">
+            <i class="ti ti-search text-slate-400"></i>
+            <input id="custProductSearch" type="text" placeholder="Search..."
+              class="bg-transparent outline-none text-sm text-slate-300 w-36" oninput="filterCustProducts()" />
+          </div>
+        </div>
+        <div id="custProductsGrid" class="grid grid-cols-3 gap-5"></div>
+      </div>
+
+      <!-- ORDERS -->
+      <div id="ctab-orders-content" class="hidden">
+        <h2 class="text-lg font-semibold text-slate-200 mb-5">My Orders</h2>
+        <div id="custOrdersList" class="flex flex-col gap-4"></div>
+      </div>
+
+      <!-- TRACKING -->
+      <div id="ctab-tracking-content" class="hidden">
+        <h2 class="text-lg font-semibold text-slate-200 mb-5">Track Your Order</h2>
+        <div class="flex gap-2 max-w-md mb-6">
+          <input id="custTrackInput" type="text" placeholder="Enter order ID"
+            class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200 outline-none focus:border-green-400" />
+          <button onclick="custTrackOrder()"
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm">
+            Track
+          </button>
+        </div>
+        <div id="custTrackingResult"></div>
+      </div>
+
+      <!-- SUPPORT -->
+      <div id="ctab-support-content" class="hidden">
+        <div class="flex gap-6">
+          <div class="flex-1 flex flex-col" style="height:500px;">
+            <div class="flex items-center gap-3 bg-green-600 rounded-t-xl px-4 py-3">
+              <div class="w-9 h-9 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-headset text-white"></i>
+              </div>
+              <div>
+                <p class="text-white text-sm font-medium">Ascent Support Team</p>
+                <div class="flex items-center gap-1.5">
+                  <div class="w-2 h-2 rounded-full bg-green-300"></div>
+                  <p class="text-green-100 text-xs">Online — Available 24/7</p>
+                </div>
+              </div>
+            </div>
+            <div id="custSupportChat" class="flex-1 overflow-y-auto bg-slate-800 border-x border-slate-700 p-4 flex flex-col gap-3">
+              <div class="flex gap-2">
+                <div class="w-7 h-7 rounded-full bg-green-900 flex items-center justify-center flex-shrink-0">
+                  <i class="ti ti-headset text-green-400 text-xs"></i>
+                </div>
+                <div class="bg-slate-700 rounded-xl rounded-tl-none px-3 py-2.5 max-w-sm">
+                  <p class="text-sm text-slate-200">Hello! Welcome to Ascent Logistics support. How can I help you today? 😊</p>
+                  <p class="text-xs text-slate-400 mt-1">Just now</p>
+                </div>
+              </div>
+            </div>
+            <div class="bg-slate-800 border border-slate-700 rounded-b-xl flex items-center gap-2 px-3 py-2.5">
+              <input id="custSupportInput" type="text" placeholder="Type your message..."
+                class="flex-1 outline-none text-sm text-slate-300 bg-transparent"
+                onkeydown="if(event.key==='Enter') sendCustSupport()" />
+              <button onclick="sendCustSupport()"
+                class="bg-green-600 hover:bg-green-700 text-white rounded-lg px-3 py-1.5 text-sm">
+                <i class="ti ti-send"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="w-64 flex flex-col gap-3">
+            <p class="text-sm font-medium text-slate-400">Quick questions</p>
+            <button onclick="askCustSupport('Where is my order?')"
+              class="bg-slate-800 border border-slate-700 text-slate-400 text-xs px-3 py-2.5 rounded-lg hover:border-green-500 text-left">
+              📦 Where is my order?
+            </button>
+            <button onclick="askCustSupport('What are your delivery times?')"
+              class="bg-slate-800 border border-slate-700 text-slate-400 text-xs px-3 py-2.5 rounded-lg hover:border-green-500 text-left">
+              🕐 What are your delivery times?
+            </button>
+            <button onclick="askCustSupport('How do I cancel an order?')"
+              class="bg-slate-800 border border-slate-700 text-slate-400 text-xs px-3 py-2.5 rounded-lg hover:border-green-500 text-left">
+              ❌ How do I cancel an order?
+            </button>
+            <button onclick="askCustSupport('How do I return a product?')"
+              class="bg-slate-800 border border-slate-700 text-slate-400 text-xs px-3 py-2.5 rounded-lg hover:border-green-500 text-left">
+              🔄 How do I return a product?
+            </button>
+            <button onclick="askCustSupport('What payment methods do you accept?')"
+              class="bg-slate-800 border border-slate-700 text-slate-400 text-xs px-3 py-2.5 rounded-lg hover:border-green-500 text-left">
+              💳 Payment methods?
+            </button>
+            <div class="bg-slate-800 border border-green-900 rounded-lg p-3 mt-2">
+              <p class="text-xs text-green-400 font-medium mb-1">📞 Phone support</p>
+              <p class="text-xs text-green-500">+212 5XX XXX XXX</p>
+              <p class="text-xs text-slate-500 mt-1">Available 24/7</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER MODAL -->
+  <div id="custOrderModal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-base font-medium text-slate-200">Place Order</h2>
+        <button onclick="closeCustOrderModal()" class="text-slate-400 hover:text-slate-200">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div id="custOrderProductInfo" class="bg-slate-900 rounded-lg p-3 mb-4"></div>
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-green-400">
+          <i class="ti ti-map-pin text-slate-500 text-sm"></i>
+          <input id="custOrderAddress" type="text" placeholder="Delivery address"
+            class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600" />
+        </div>
+        <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-green-400">
+          <i class="ti ti-hash text-slate-500 text-sm"></i>
+          <input id="custOrderQty" type="number" min="1" value="1"
+            class="bg-transparent outline-none text-sm text-slate-200 w-full"
+            oninput="updateOrderTotal()" />
+        </div>
+        <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 focus-within:border-green-400">
+          <i class="ti ti-notes text-slate-500 text-sm"></i>
+          <input id="custOrderNotes" type="text" placeholder="Notes (optional)"
+            class="bg-transparent outline-none text-sm text-slate-200 w-full placeholder-slate-600" />
+        </div>
+        <div id="custOrderTotal" class="bg-green-900 bg-opacity-30 border border-green-800 rounded-lg px-3 py-2 text-sm text-green-400 font-medium"></div>
+        <button onclick="confirmCustOrder()"
+          class="bg-green-600 hover:bg-green-700 text-white text-sm py-2.5 rounded-lg mt-1">
+          ✅ Confirm Order
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://tqqbsxustgqjngqpupnt.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxcWJzeHVzdGdxam5ncXB1cG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MzAwNjAsImV4cCI6MjA5NzMwNjA2MH0.pYYU7Dg_cZ5pYOeX8WsNhW2ZCCffcvpm9iYplQSFWgY';
+    const GROQ_API_KEY = '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';
+
+    let currentCustomer = null;
+    let selectedProduct = null;
+    let custSupportMessages = [];
+    let myOrders = JSON.parse(localStorage.getItem('customer_orders') || '[]');
+
+    const products = [
+      { id: 'PRD-001', name: 'Electronics - Batch 12', category: 'Electronics', price: 2500, unit: 'pallet', stock: 120, delivery: '2-3 days', icon: '💻' },
+      { id: 'PRD-002', name: 'Textiles - Roll 5', category: 'Textiles', price: 800, unit: 'roll', stock: 8, delivery: '1-2 days', icon: '🧵' },
+      { id: 'PRD-003', name: 'Auto Parts - Set B', category: 'Auto Parts', price: 1200, unit: 'set', stock: 0, delivery: 'Out of stock', icon: '🔧' },
+      { id: 'PRD-004', name: 'Food Items - Crate 9', category: 'Food', price: 450, unit: 'crate', stock: 54, delivery: '1 day', icon: '🥫' },
+      { id: 'PRD-005', name: 'Cosmetics - Pack 3', category: 'Cosmetics', price: 320, unit: 'pack', stock: 5, delivery: '2-3 days', icon: '💄' },
+    ];
+
+    // ─── NAVIGATION ──────────────────────────────────────────
+    function showWorkerLogin() {
+      document.getElementById('heroSection').classList.add('hidden');
+      document.getElementById('workerSection').classList.remove('hidden');
+      document.getElementById('customerSection').classList.add('hidden');
+    }
+
+    function showCustomerSection() {
+      document.getElementById('heroSection').classList.add('hidden');
+      document.getElementById('workerSection').classList.add('hidden');
+      document.getElementById('customerSection').classList.remove('hidden');
+      const saved = localStorage.getItem('customer_session');
+      if (saved) {
+        currentCustomer = JSON.parse(saved);
+        showCustDashboard();
+      }
+    }
+
+    function goBack() {
+      document.getElementById('heroSection').classList.remove('hidden');
+      document.getElementById('workerSection').classList.add('hidden');
+      document.getElementById('customerSection').classList.add('hidden');
+    }
+
+    // ─── WORKER LOGIN ─────────────────────────────────────────
+    async function workerLogin() {
+      const email = document.getElementById('workerEmail').value.trim();
+      const password = document.getElementById('workerPassword').value.trim();
+      const btn = document.getElementById('workerLoginBtn');
+      const errorEl = document.getElementById('workerError');
+
+      if (!email || !password) {
+        errorEl.textContent = 'Please enter your email and password.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      btn.innerHTML = '<i class="ti ti-loader animate-spin"></i> Signing in...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(email)}&password=eq.${encodeURIComponent(password)}&active=eq.true&select=*`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const data = await res.json();
+
+        if (!data.length) {
+          errorEl.textContent = 'Invalid email or password.';
+          errorEl.classList.remove('hidden');
+          btn.innerHTML = '<i class="ti ti-login"></i> Sign in to dashboard';
+          btn.disabled = false;
+          return;
+        }
+
+        const user = data[0];
+        localStorage.setItem('ascent_user', JSON.stringify({
+          id: user.id,
+          full_name: user.full_name,
+          email: user.email,
+          role: user.role
+        }));
+
+        window.location.href = user.role === 'driver' ? 'tracking.html' : 'index.html';
+
+      } catch (err) {
+        errorEl.textContent = 'Connection error. Please try again.';
+        errorEl.classList.remove('hidden');
+        btn.innerHTML = '<i class="ti ti-login"></i> Sign in to dashboard';
+        btn.disabled = false;
+      }
+    }
+
+    // ─── CUSTOMER AUTH ────────────────────────────────────────
+    async function customerRegister() {
+      const full_name = document.getElementById('custRegName').value.trim();
+      const email = document.getElementById('custRegEmail').value.trim();
+      const phone = document.getElementById('custRegPhone').value.trim();
+      const password = document.getElementById('custRegPassword').value.trim();
+      const btn = document.getElementById('custRegBtn');
+      const errEl = document.getElementById('customerRegError');
+      const sucEl = document.getElementById('customerRegSuccess');
+
+      if (!full_name || !email || !password) {
+        errEl.textContent = 'Please fill all required fields.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (password.length < 6) {
+        errEl.textContent = 'Password must be at least 6 characters.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      btn.textContent = 'Creating...';
+      btn.disabled = true;
+      errEl.classList.add('hidden');
+
+      try {
+        // Register with Supabase Auth
+        const authRes = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+          method: 'POST',
+          headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const authData = await authRes.json();
+
+        if (authData.error) {
+          errEl.textContent = authData.error.message || 'Registration failed.';
+          errEl.classList.remove('hidden');
+          btn.textContent = 'Create account';
+          btn.disabled = false;
+          return;
+        }
+
+        // Save to customers table
+        await fetch(`${SUPABASE_URL}/rest/v1/customers`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ full_name, email, password, phone })
+        });
+
+        sucEl.textContent = '✅ Account created! Check your email to confirm before signing in.';
+        sucEl.classList.remove('hidden');
+
+      } catch (err) {
+        errEl.textContent = 'Connection error. Try again.';
+        errEl.classList.remove('hidden');
+      }
+
+      btn.textContent = 'Create account';
+      btn.disabled = false;
+    }
+
+    async function customerLogin() {
+      const email = document.getElementById('custLoginEmail').value.trim();
+      const password = document.getElementById('custLoginPassword').value.trim();
+      const btn = document.getElementById('custLoginBtn');
+      const errEl = document.getElementById('customerLoginError');
+
+      if (!email || !password) {
+        errEl.textContent = 'Please enter your email and password.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      btn.textContent = 'Signing in...';
+      btn.disabled = true;
+      errEl.classList.add('hidden');
+
+      try {
+        const authRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+          method: 'POST',
+          headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const authData = await authRes.json();
+
+        if (authData.error) {
+          if (authData.error_description?.includes('Email not confirmed')) {
+            errEl.textContent = '⚠️ Please confirm your email first. Check your inbox.';
+          } else {
+            errEl.textContent = 'Invalid email or password.';
+          }
+          errEl.classList.remove('hidden');
+          btn.textContent = 'Sign in';
+          btn.disabled = false;
+          return;
+        }
+
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/customers?email=eq.${encodeURIComponent(email)}&select=*`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const data = await res.json();
+
+        if (!data.length) {
+          errEl.textContent = 'Account not found.';
+          errEl.classList.remove('hidden');
+          btn.textContent = 'Sign in';
+          btn.disabled = false;
+          return;
+        }
+
+        currentCustomer = data[0];
+        localStorage.setItem('customer_session', JSON.stringify(currentCustomer));
+        showCustDashboard();
+
+      } catch (err) {
+        errEl.textContent = 'Connection error. Try again.';
+        errEl.classList.remove('hidden');
+      }
+
+      btn.textContent = 'Sign in';
+      btn.disabled = false;
+    }
+
+    function customerLogout() {
+      localStorage.removeItem('customer_session');
+      currentCustomer = null;
+      document.getElementById('customerDashboard').classList.add('hidden');
+      document.getElementById('customerAuth').classList.remove('hidden');
+    }
+
+    function showCustDashboard() {
+      document.getElementById('customerAuth').classList.add('hidden');
+      document.getElementById('customerDashboard').classList.remove('hidden');
+      document.getElementById('custWelcomeName').textContent = 'Hello, ' + currentCustomer.full_name + ' 👋';
+      showCustTab('products');
+      renderCustProducts(products);
+      renderCustOrders();
+    }
+
+    // ─── CUSTOMER TABS ────────────────────────────────────────
+    function showCustTab(tab) {
+      ['products','orders','tracking','support'].forEach(t => {
+        document.getElementById(`ctab-${t}-content`).classList.toggle('hidden', t !== tab);
+        const btn = document.getElementById(`ctab-${t}`);
+        if (t === tab) {
+          btn.className = 'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-green-600 text-white';
+        } else {
+          btn.className = 'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:bg-slate-700';
+        }
+      });
+    }
+
+    // ─── PRODUCTS ─────────────────────────────────────────────
+    function renderCustProducts(data) {
+      document.getElementById('custProductsGrid').innerHTML = data.map(p => `
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 hover:border-green-700 transition-all">
+          <div class="text-4xl mb-3">${p.icon}</div>
+          <p class="text-xs text-slate-500 mb-1 uppercase tracking-wide">${p.category}</p>
+          <h3 class="text-sm font-semibold text-slate-200 mb-3">${p.name}</h3>
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-xl font-bold text-green-400">${p.price} <span class="text-xs text-slate-500 font-normal">MAD/${p.unit}</span></p>
+            ${p.stock > 0
+              ? `<span class="text-xs bg-green-900 text-green-400 px-2 py-1 rounded-full">${p.stock} in stock</span>`
+              : `<span class="text-xs bg-red-900 text-red-400 px-2 py-1 rounded-full">Out of stock</span>`}
+          </div>
+          <p class="text-xs text-slate-500 mb-4"><i class="ti ti-clock mr-1 text-green-500"></i>Delivery: <strong class="text-slate-400">${p.delivery}</strong></p>
+          <button onclick="openCustOrderModal('${p.id}')"
+            ${p.stock === 0 ? 'disabled' : ''}
+            class="w-full text-sm py-2.5 rounded-lg font-medium transition-all
+            ${p.stock > 0 ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}">
+            ${p.stock > 0 ? '🛒 Order now' : 'Unavailable'}
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function filterCustProducts() {
+      const search = document.getElementById('custProductSearch').value.toLowerCase();
+      renderCustProducts(products.filter(p =>
+        p.name.toLowerCase().includes(search) || p.category.toLowerCase().includes(search)
+      ));
+    }
+
+    // ─── ORDER MODAL ──────────────────────────────────────────
+    function openCustOrderModal(productId) {
+      selectedProduct = products.find(p => p.id === productId);
+      if (!selectedProduct) return;
+      document.getElementById('custOrderProductInfo').innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">${selectedProduct.icon}</span>
+          <div>
+            <p class="text-sm font-semibold text-slate-200">${selectedProduct.name}</p>
+            <p class="text-xs text-slate-400">${selectedProduct.price} MAD / ${selectedProduct.unit}</p>
+            <p class="text-xs text-green-400">🚚 Delivery: ${selectedProduct.delivery}</p>
+          </div>
+        </div>
+      `;
+      document.getElementById('custOrderQty').value = 1;
+      document.getElementById('custOrderTotal').textContent = `Total: ${selectedProduct.price} MAD`;
+      document.getElementById('custOrderModal').style.display = 'flex';
+    }
+
+    function updateOrderTotal() {
+      if (!selectedProduct) return;
+      const qty = parseInt(document.getElementById('custOrderQty').value) || 1;
+      document.getElementById('custOrderTotal').textContent = `Total: ${selectedProduct.price * qty} MAD`;
+    }
+
+    function closeCustOrderModal() {
+      document.getElementById('custOrderModal').style.display = 'none';
+    }
+
+    function confirmCustOrder() {
+      const address = document.getElementById('custOrderAddress').value.trim();
+      const qty = parseInt(document.getElementById('custOrderQty').value);
+      const notes = document.getElementById('custOrderNotes').value.trim();
+      if (!address || !qty) return alert('Please fill all fields.');
+      const order = {
+        id: 'ORD-C-' + Math.floor(Math.random() * 9000 + 1000),
+        product: selectedProduct.name,
+        icon: selectedProduct.icon,
+        price: selectedProduct.price * qty,
+        qty, address, notes,
+        delivery: selectedProduct.delivery,
+        status: 'placed',
+        date: new Date().toLocaleDateString(),
+        customer: currentCustomer.full_name
+      };
+      myOrders.push(order);
+      localStorage.setItem('customer_orders', JSON.stringify(myOrders));
+      closeCustOrderModal();
+      alert(`✅ Order placed!\n\nOrder ID: ${order.id}\nDelivery: ${order.delivery}\n\nThank you!`);
+      showCustTab('orders');
+      renderCustOrders();
+    }
+
+    // ─── MY ORDERS ────────────────────────────────────────────
+    function renderCustOrders() {
+      const container = document.getElementById('custOrdersList');
+      if (!myOrders.length) {
+        container.innerHTML = `<div class="text-center py-12 text-slate-500"><i class="ti ti-package text-4xl mb-3 block"></i><p class="text-sm">No orders yet</p><button onclick="showCustTab('products')" class="mt-3 text-green-500 text-sm hover:underline">Browse products</button></div>`;
+        return;
+      }
+      const badge = { placed:'bg-blue-900 text-blue-400', processing:'bg-yellow-900 text-yellow-400', shipped:'bg-purple-900 text-purple-400', delivered:'bg-green-900 text-green-400' };
+      container.innerHTML = myOrders.slice().reverse().map(o => `
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">${o.icon || '📦'}</span>
+              <div>
+                <p class="text-sm font-semibold text-slate-200">${o.id}</p>
+                <p class="text-xs text-slate-500">${o.date}</p>
+              </div>
+            </div>
+            <span class="text-xs px-2 py-1 rounded-full ${badge[o.status] || 'bg-slate-700 text-slate-400'} capitalize">${o.status}</span>
+          </div>
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-sm text-slate-400">${o.product} × ${o.qty}</p>
+            <p class="text-sm font-bold text-green-400">${o.price} MAD</p>
+          </div>
+          <p class="text-xs text-slate-500 mb-1"><i class="ti ti-map-pin mr-1"></i>${o.address}</p>
+          <p class="text-xs text-slate-500 mb-3"><i class="ti ti-clock mr-1"></i>Delivery: <strong>${o.delivery}</strong></p>
+          <button onclick="document.getElementById('custTrackInput').value='${o.id}'; showCustTab('tracking'); custTrackOrder();"
+            class="text-xs text-green-400 hover:underline flex items-center gap-1">
+            <i class="ti ti-map-pin"></i> Track this order
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // ─── TRACKING ─────────────────────────────────────────────
+    function custTrackOrder() {
+      const id = document.getElementById('custTrackInput').value.trim();
+      const order = myOrders.find(o => o.id === id);
+      const allSteps = ['Order placed','Processing','Shipped','Delivered'];
+      const statusIndex = { placed:1, processing:2, shipped:3, delivered:4 };
+      if (!order) {
+        document.getElementById('custTrackingResult').innerHTML = `<div class="bg-red-900 bg-opacity-30 border border-red-800 text-red-400 text-sm px-4 py-3 rounded-lg">❌ Order not found. Please check the order ID.</div>`;
+        return;
+      }
+      const completed = statusIndex[order.status] || 1;
+      const stepsHTML = allSteps.map((step, i) => {
+        const done = i < completed;
+        const active = i === completed - 1;
+        return `
+          <div class="flex flex-col items-center flex-1">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium mb-2
+              ${done ? 'bg-green-500 text-white' : 'bg-slate-700 text-slate-400'}
+              ${active ? 'ring-2 ring-green-400 ring-offset-2 ring-offset-slate-800' : ''}">
+              ${done ? '<i class="ti ti-check"></i>' : i + 1}
+            </div>
+            <p class="text-xs text-center ${done ? 'text-slate-300' : 'text-slate-500'}">${step}</p>
+          </div>
+          ${i < allSteps.length-1 ? `<div class="flex-1 h-0.5 mt-4 ${i < completed-1 ? 'bg-green-500' : 'bg-slate-700'}"></div>` : ''}
+        `;
+      }).join('');
+      document.getElementById('custTrackingResult').innerHTML = `
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl">${order.icon || '📦'}</span>
+              <div>
+                <p class="text-sm font-semibold text-slate-200">${order.id}</p>
+                <p class="text-xs text-slate-400">${order.product} · ${order.date}</p>
+              </div>
+            </div>
+            <span class="text-xs px-3 py-1 rounded-full bg-green-900 text-green-400 capitalize">${order.status}</span>
+          </div>
+          <div class="flex items-center mb-6">${stepsHTML}</div>
+          <div class="flex gap-6 text-xs text-slate-500">
+            <p><i class="ti ti-clock mr-1"></i>Est. delivery: <strong class="text-slate-400">${order.delivery}</strong></p>
+            <p><i class="ti ti-map-pin mr-1"></i>${order.address}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // ─── SUPPORT ──────────────────────────────────────────────
+    async function sendCustSupport() {
+      const input = document.getElementById('custSupportInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      appendCustSupport('user', text);
+      custSupportMessages.push({ role: 'user', content: text });
+      appendCustTyping();
+      try {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+          body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: [{
+              role: 'system',
+              content: `You are a friendly 24/7 customer support agent for Ascent Logistics and Transport, a logistics company in Casablanca, Morocco.
+Products: Electronics (2500 MAD, 2-3 days), Textiles (800 MAD, 1-2 days), Auto Parts (out of stock), Food (450 MAD, 1 day), Cosmetics (320 MAD, 2-3 days).
+Payment: Cash on delivery and bank transfer. Phone: +212 5XX XXX XXX.
+Be warm, helpful, and professional. Respond in the customer's language.`
+            }, ...custSupportMessages]
+          })
+        });
+        const data = await res.json();
+        const reply = data.choices[0].message.content;
+        document.getElementById('cust-typing')?.remove();
+        appendCustSupport('agent', reply);
+        custSupportMessages.push({ role: 'assistant', content: reply });
+      } catch (err) {
+        document.getElementById('cust-typing')?.remove();
+        appendCustSupport('agent', 'Sorry, I\'m having a technical issue. Please call us at +212 5XX XXX XXX!');
+      }
+    }
+
+    function appendCustSupport(role, text) {
+      const chat = document.getElementById('custSupportChat');
+      const isUser = role === 'user';
+      const div = document.createElement('div');
+      div.className = `flex gap-2 ${isUser ? 'justify-end' : ''}`;
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      div.innerHTML = isUser ? `
+        <div class="max-w-xs">
+          <div class="bg-green-600 text-white rounded-xl rounded-tr-none px-3 py-2.5">
+            <p class="text-sm">${text}</p>
+          </div>
+          <p class="text-xs text-slate-500 mt-1 text-right">${time}</p>
+        </div>
+      ` : `
+        <div class="w-7 h-7 rounded-full bg-green-900 flex items-center justify-center flex-shrink-0 mt-1">
+          <i class="ti ti-headset text-green-400 text-xs"></i>
+        </div>
+        <div class="max-w-sm">
+          <div class="bg-slate-700 rounded-xl rounded-tl-none px-3 py-2.5">
+            <p class="text-sm text-slate-200 whitespace-pre-line">${text}</p>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">${time}</p>
+        </div>
+      `;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function appendCustTyping() {
+      const chat = document.getElementById('custSupportChat');
+      const div = document.createElement('div');
+      div.id = 'cust-typing';
+      div.className = 'flex gap-2';
+      div.innerHTML = `
+        <div class="w-7 h-7 rounded-full bg-green-900 flex items-center justify-center flex-shrink-0">
+          <i class="ti ti-headset text-green-400 text-xs"></i>
+        </div>
+        <div class="bg-slate-700 rounded-xl rounded-tl-none px-3 py-2.5">
+          <p class="text-sm text-slate-400 italic">Typing...</p>
+        </div>
+      `;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function askCustSupport(q) {
+      document.getElementById('custSupportInput').value = q;
+      sendCustSupport();
+    }
+
+    // ─── SESSION CHECK ────────────────────────────────────────
+    const savedWorker = localStorage.getItem('ascent_user');
+    if (savedWorker) window.location.href = 'index.html';
+
+    const savedCustomer = localStorage.getItem('customer_session');
+    if (savedCustomer) {
+      currentCustomer = JSON.parse(savedCustomer);
+      showCustomerSection();
+    }
+  </script>
+
+</body>
+</html>
